@@ -3,6 +3,10 @@
     "target": "ES2017",
     "module": "commonjs",
     "lib": ["dom", "es6", "ES2017", "esnext.asynciterable"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],      
+    },
     "skipLibCheck": true,
     "sourceMap": true,
     "outDir": "./dist",
@@ -23,8 +27,7 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "resolveJsonModule": true,
-    "allowJs": true,
-    "baseUrl": "./src"
+    "allowJs": true
   },
   "exclude": ["node_modules", "src/**/*.spec.ts"],
   "include": ["src/**/*.ts", "src/**/*.js"]

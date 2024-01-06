@@ -1,11 +1,11 @@
 {
   "compilerOptions": {
-    "target": "ES2017",
+    "target": "ESNext",
     "module": "commonjs",
     "lib": ["dom", "es6", "ES2017", "esnext.asynciterable"],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],      
+      "@/*": ["src/*"]
     },
     "skipLibCheck": true,
     "sourceMap": true,
@@ -30,5 +30,8 @@
     "allowJs": true
   },
   "exclude": ["node_modules", "src/**/*.spec.ts"],
-  "include": ["src/**/*.ts", "src/**/*.js"]
+  "include": ["src/**/*.ts", "src/**/*.js"],
+  "ts-node": {
+    "require": ["tsconfig-paths/register"]
+  }
 }

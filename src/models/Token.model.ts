@@ -1,10 +1,11 @@
 import { Schema } from 'mongoose';
 
 export interface IToken {
+  _id?: string;
   refreshToken: string;
-  ip: string;
-  userAgent: string;
-  user: Schema.Types.ObjectId;
+  ip?: string;
+  userAgent?: string;
+  user: string | Schema.Types.ObjectId;
 }
 
 const schema = new Schema<IToken>({

@@ -1,3 +1,4 @@
+import { IUser } from '@/models/User.model';
 import { Response } from 'express';
 import JWT from 'jsonwebtoken';
 
@@ -11,7 +12,7 @@ const createToken = ({ payload, isAccessToken }: { payload: any, isAccessToken: 
 
 const isTokenValid = ({ token }:{ token: string }) => JWT.verify(token, process.env.JWT_SECRET!)
 
-const attachCookiesToResponse = ({ res, user, refreshToken }: { res: Response, user: any, refreshToken: string }) => {
+const attachCookiesToResponse = ({ res, user, refreshToken }: { res: Response, user: IUser, refreshToken: string }) => {
     const accessToken = createToken({ payload: user, isAccessToken: true })
     
     const oneDay = 1000 * 60 * 60 * 24;
@@ -26,7 +27,7 @@ const attachCookiesToResponse = ({ res, user, refreshToken }: { res: Response, u
 
     res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
-        secure: true,
+        secure: process.env.NODE_ENV === 'production',
         signed: true,
         expires: new Date(Date.now() + longerExpiry)
     });

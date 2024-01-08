@@ -3,7 +3,7 @@ import validator from 'validator';
 import bcrypt from 'bcryptjs';
 import Token, { IToken } from './Token.model';
 
-interface IUser {
+export interface IUser {
   _id?: string;
   name: string;
   email: string;
@@ -15,11 +15,18 @@ interface IUser {
   verificationToken?: string;
   passwordToken?: string;
   passwordTokenExpirationDate?: Date;
-  token?: IToken[]
+  tokens?: IToken[]
+}
+
+export interface TokenizeUserData {
+  _id: string;
+  name: string;
+  email: string;
 }
 
 interface IUserMethods {
   comparePassword(passwordToCompare: string): Promise<boolean>;
+  toJSON(): TokenizeUserData;
 }
 
 type UserModel = Model<IUser, {}, IUserMethods>;
@@ -29,7 +36,8 @@ const schema = new Schema<IUser, UserModel, IUserMethods>(
     name: {
       type: String,
       required: [true, 'Please Provide Name.'],
-      minlength: [100, 'Name cannot be more than 100 characters.'],
+      trim: true,
+      maxlength: [100, 'Name cannot be more than 100 characters.'],
     },
     email: {
       type: String,
@@ -52,6 +60,7 @@ const schema = new Schema<IUser, UserModel, IUserMethods>(
       type: String,
       required: [true, 'Please Provide Password.'],
       minlength: 8,
+      trim: true,
       validate: {
         validator: function (value: string) {
           return validator.isStrongPassword(value, {
@@ -71,7 +80,7 @@ const schema = new Schema<IUser, UserModel, IUserMethods>(
     profilePicture: String,
     verificationToken: String,
     verifiedOn: Date,
-    token: [Token]
+    tokens: [Token]
   },
   {
     timestamps: true,
@@ -82,6 +91,16 @@ const schema = new Schema<IUser, UserModel, IUserMethods>(
 schema.methods.comparePassword = function (passwordToCompare) {
   return bcrypt.compare(passwordToCompare, this.password);
 };
+
+schema.methods.toJSON = function () {
+  const tokenizedData: TokenizeUserData = {
+    _id: this._id,
+    name: this.name,
+    email: this.email
+  }
+
+  return tokenizedData;
+}
 
 // ? HOOKS
 schema.pre('save', async function() {

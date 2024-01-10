@@ -5,7 +5,6 @@ export interface IToken {
   refreshToken: string;
   ip?: string;
   userAgent?: string;
-  user: string | Schema.Types.ObjectId;
 }
 
 const schema = new Schema<IToken>({
@@ -13,10 +12,6 @@ const schema = new Schema<IToken>({
   ip: {
     type: String,
     unique: true,
-  },
-  user: {
-    type: Schema.Types.ObjectId,
-    ref: 'User'
   },
   userAgent: {
     type: String,

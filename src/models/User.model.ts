@@ -7,6 +7,7 @@ export interface IUser {
   _id?: string;
   name: string;
   email: string;
+  username: string;
   profilePicture?: string;
   password: string;
   isAdmin?: boolean;
@@ -22,6 +23,7 @@ export interface TokenizeUserData {
   _id: string;
   name: string;
   email: string;
+  username: string;
 }
 
 interface IUserMethods {
@@ -47,6 +49,14 @@ const schema = new Schema<IUser, UserModel, IUserMethods>(
         validator: (value: string) => validator.isEmail(value),
         message: (props) => `${props.value} is not a valid email.`,
       },
+    },
+    username: {
+      type: String,
+      required: [true, 'Please Provide Username'],
+      unique: true,
+      trim: true,
+      minlength: [3, 'Username Should be minimum of 3 Characters'],
+      maxlength: [15, 'Username Should be maximum of 15 Characters'],
     },
     isAdmin: {
       type: Boolean,
@@ -80,7 +90,7 @@ const schema = new Schema<IUser, UserModel, IUserMethods>(
     profilePicture: String,
     verificationToken: String,
     verifiedOn: Date,
-    tokens: [Token]
+    tokens: [Token],
   },
   {
     timestamps: true,
@@ -96,7 +106,8 @@ schema.methods.toJSON = function () {
   const tokenizedData: TokenizeUserData = {
     _id: this._id,
     name: this.name,
-    email: this.email
+    email: this.email,
+    username: this.username
   }
 
   return tokenizedData;

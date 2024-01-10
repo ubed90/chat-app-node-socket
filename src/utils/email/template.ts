@@ -51,6 +51,10 @@ const getTemplate = ({
 			border-radius: 5px;
 		}
 
+		.button.alert {
+			background-color: tomato;
+		}
+
 		.button:hover {
 			background-color: #3e8e41;
 		}
@@ -62,6 +66,16 @@ const getTemplate = ({
 			margin-top: 50px;
 			padding-top: 20px;
 			border-top: 1px solid #cccccc;
+		}
+
+		.note {
+			display: block;
+			font-size: 11px;
+			margin-top: 10px;
+		}
+
+		.note.alert {
+			color: tomato;
 		}
 	</style>
 </head>

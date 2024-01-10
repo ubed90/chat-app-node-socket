@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 
 const getAllChatsController = (req: Request, res: Response) => {
+  console.log(req.signedCookies, res.locals.user);
   return res.send('GET All USER CHATS');
 };
 

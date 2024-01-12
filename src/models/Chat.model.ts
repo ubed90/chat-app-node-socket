@@ -2,10 +2,11 @@ import { Model, Schema, Types, model } from "mongoose";
 
 interface IChat {
     _id?: string;
+    name?: string;
     isGroupChat?: boolean;
     users: Types.Array<Types.ObjectId>;
     lastMessage: Types.ObjectId;
-    groupAdmin: Types.ObjectId;
+    admin: Types.ObjectId;
 }
 
 interface IChatMethods {}
@@ -13,22 +14,33 @@ interface IChatMethods {}
 type ChatModel = Model<IChat, {}, IChatMethods>;
 
 const schema = new Schema<IChat, ChatModel, IChatMethods>({
+    name: {
+        type: String,
+        default: 'One on One Chat'
+    },
     isGroupChat: {
         type: Boolean,
         default: false
     },
     users: [{
         type: Schema.Types.ObjectId,
+        required: true,
         ref: 'User'
     }],
-    groupAdmin: {
+    admin: {
         type: Schema.Types.ObjectId,
+        required: true,
         ref: 'User'
     },
     lastMessage: {
         type: Schema.Types.ObjectId,
         ref: 'Message'
     }
+});
+
+// * Pre Delete Hook
+schema.pre('deleteOne', { document: true },async function() {
+    await this.model('Message').deleteMany({ chat: this._id });
 });
 
 const Chat = model<IChat, ChatModel>('Chat', schema);

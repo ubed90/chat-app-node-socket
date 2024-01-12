@@ -24,6 +24,8 @@ const schema = new Schema<IMessage, MessageModel, IMessageMethods>({
         type: Schema.Types.ObjectId,
         ref: 'User'
     }
+}, {
+    timestamps: true
 });
 
 const Message = model<IMessage, MessageModel>('Message', schema);

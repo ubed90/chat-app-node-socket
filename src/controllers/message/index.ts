@@ -1,11 +1,119 @@
+import { BadRequestError, CustomApiError, NotFoundError } from "@/errors";
+import { Chat, Message } from "@/models";
 import { Request, Response } from "express";
+import { StatusCodes } from "http-status-codes";
+import { PipelineStage, Types } from "mongoose";
 
-const getAllChatMessagesController = (req: Request, res: Response) => {
-    return res.send("GET ALL CHAT MESSAGES");
+const messagesCommonAggregation = (): PipelineStage[] => {
+  return [
+    {
+      $lookup: {
+        from: 'users',
+        foreignField: '_id',
+        localField: 'sender',
+        as: 'sender',
+        pipeline: [
+          {
+            $project: {
+              name: 1,
+              email: 1,
+              username: 1,
+              profilePicture: 1
+            }
+          }
+        ]
+      }
+    },
+    {
+      $addFields: {
+        sender: {
+          $first: '$sender'
+        }
+      }
+    }
+  ]
 }
 
-const sendMessageController = (req: Request, res: Response) => {
-  return res.send('SEND MESSAGE');
+const getAllChatMessagesController = async (req: Request, res: Response) => {
+  const { chatId } = req.params;
+
+  if(!chatId) throw new BadRequestError('Invalid chat Id: '+chatId);
+
+  const chat = await Chat.findOne({
+    _id: chatId,
+    users: {
+      $elemMatch: {
+        $eq: new Types.ObjectId(res.locals.user._id)
+      }
+    }
+  });
+
+  if(!chat) throw new NotFoundError("You don't have any such chat");
+
+  const allMessages = await Message.aggregate([
+    {
+      $match: {
+        chat: new Types.ObjectId(chatId)
+      }
+    },
+    ...messagesCommonAggregation(),
+    {
+      $sort: {
+        createdAt: -1,
+      }
+    }
+  ])
+
+  return res.status(200).json({
+    status: 'success',
+    message: 'Messages fetched successfully',
+    messages: allMessages
+  })
+}
+
+const sendMessageController = async (req: Request, res: Response) => {
+  const { chatId } = req.params;
+  const { content } = req.body;
+
+  if (!chatId || !content) throw new BadRequestError('Invalid request');
+
+  const chat = await Chat.findOne({
+    _id: chatId,
+    users: {
+      $elemMatch: {
+        $eq: new Types.ObjectId(res.locals.user._id),
+      },
+    },
+  });
+
+  if (!chat) throw new NotFoundError("You don't have any such chat");
+
+  const newMessage = await Message.create({
+    content,
+    sender: new Types.ObjectId(res.locals.user._id),
+    chat: new Types.ObjectId(chatId)
+  });
+
+  chat.lastMessage = new Types.ObjectId(newMessage._id);
+
+  await chat.save();
+
+  const message = await Message.aggregate([
+    {
+      $match: {
+        _id: new Types.ObjectId(newMessage._id),
+      },
+    },
+    ...messagesCommonAggregation()
+  ]);
+
+  if(!message[0]) throw new CustomApiError('Internal server error', 500);
+
+  return res.status(StatusCodes.CREATED).json({
+    status: 'success',
+    message: 'Message sent successfully',
+    newMessage: message[0]
+  });
 };
 
 export { getAllChatMessagesController, sendMessageController };

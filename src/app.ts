@@ -9,6 +9,8 @@ import connectWithDatabase from '@/database';
 // ! External MW's
 import cookieParser from "cookie-parser";
 import morgan from 'morgan';
+// ? A MW to extract CLient IP
+import requestIP from 'request-ip';
 
 // * Custom Middleware's
 import notFoundMiddleware from './middlewares/notFound.middleware';
@@ -22,7 +24,9 @@ const PORT = process.env.PORT || 3000;
 const app = express();
 
 // * Applying Middlewares
-app.use(express.json());
+app.use(requestIP.mw());
+app.use(express.json({ limit: '16kb' }));
+app.use(express.urlencoded({ extended: true, limit: '16kb' }));
 app.use(cookieParser(process.env.JWT_SECRET))
 if(process.env.NODE_ENV) {
     app.use(morgan('dev'));

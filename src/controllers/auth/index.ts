@@ -8,7 +8,6 @@ import { User } from '@/models';
 import { Request, Response } from 'express';
 import crypto from 'crypto';
 import { sendPasswordResetEmail, sendVerificationEmail } from '@/utils/email';
-import { IToken } from '@/models/Token.model';
 import { attachCookiesToResponse, createToken, hashString, isTokenValid } from '@/utils';
 import { StatusCodes } from 'http-status-codes';
 
@@ -95,7 +94,7 @@ const loginController = async (req: Request, res: Response) => {
   if (!isValidCredential)
     throw new UnauthorizedError('Invalid credentials. Try again later');
 
-  const existingToken = user.tokens?.find(token => token.ip === req.ip && token.userAgent === req.headers['user-agent']);
+  const existingToken = user.tokens?.find(token => token.ip === req.clientIp && token.userAgent === req.headers['user-agent']);
   let refreshToken;
 
   try {
@@ -108,7 +107,7 @@ const loginController = async (req: Request, res: Response) => {
       });
 
       const token = {
-        ip: req.ip,
+        ip: req.clientIp,
         userAgent: req.headers['user-agent'],
         refreshToken,
       };
@@ -122,7 +121,7 @@ const loginController = async (req: Request, res: Response) => {
     });
 
     const token = {
-      ip: req.ip,
+      ip: req.clientIp,
       userAgent: req.headers['user-agent'],
       refreshToken
     };

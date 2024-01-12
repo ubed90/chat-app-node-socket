@@ -9,14 +9,8 @@ export interface IToken {
 
 const schema = new Schema<IToken>({
   refreshToken: String,
-  ip: {
-    type: String,
-    unique: true,
-  },
-  userAgent: {
-    type: String,
-    unique: true,
-  },
+  ip: String,
+  userAgent: String,
 });
 
 export default schema

@@ -19,9 +19,35 @@ import errorHandlerMiddleware from './middlewares/errorHandler.middleware';
 // * Application Wide Routes
 import appRoutes from "./routes";
 
+// * Socket Imports
+import { createServer } from 'http';
+import { Server } from 'socket.io';
+import authorizeSocketMiddleware from './middlewares/socket.middleware';
+import initializeSocketIO from './utils/socket/initializeSocketIO';
+import path from 'path';
+
 const PORT = process.env.PORT || 3000;
 
+// * Initialize express
 const app = express();
+
+// ! Initialize Sockets
+const httpServer = createServer(app);
+const io = new Server(httpServer, {
+    pingTimeout: 60000,
+    cors: {
+        origin: process.env.ORIGIN,
+        credentials: true,
+    }
+})
+
+// * Set Socket Auth MW
+io.use(authorizeSocketMiddleware);
+
+app.set('io', io);
+
+// * Setting Public Directory
+app.use(express.static(path.join(__dirname, '../public')));
 
 // * Applying Middlewares
 app.use(requestIP.mw());
@@ -43,11 +69,14 @@ app.use('/api/v1', appRoutes)
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
 
+// * Initialize our SocketIo
+initializeSocketIO({ io });
+
 
 const start = async () => {
     try {
         await connectWithDatabase(process.env.MONGO_URI as string + process.env.DB_NAME)
-        app.listen(PORT, () => console.log(`App is running on http:localhost:${PORT} 🚀`))
+        httpServer.listen(PORT, () => console.log(`App is running on http:localhost:${PORT} 🚀`))
     } catch (error) {
         console.log(error)
         process.exit();

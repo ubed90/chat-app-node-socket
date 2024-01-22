@@ -1,0 +1,1 @@
+export { default as CHAT_EVENTS } from './eventsMap';

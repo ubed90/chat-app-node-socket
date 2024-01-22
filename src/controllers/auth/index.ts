@@ -161,14 +161,16 @@ const logoutController = async (req: Request, res: Response) => {
   res.cookie('accessToken', 'logout', {
     httpOnly: true,
     signed: true,
-    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'development' ? true : 'none',
+    secure: process.env.NODE_ENV === 'development' ? false : true, 
     expires: new Date(Date.now()),
   });
 
   res.cookie('refreshToken', 'logout', {
     httpOnly: true,
     signed: true,
-    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'development' ? true : 'none',
+    secure: process.env.NODE_ENV === 'development' ? false : true, 
     expires: new Date(Date.now()),
   });
 

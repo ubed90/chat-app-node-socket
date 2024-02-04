@@ -4,6 +4,7 @@ import {
   loginController,
   logoutController,
   registerController,
+  removeProfilePictureController,
   resetPasswordController,
   updateProfileController,
   verifyEmailController,
@@ -24,6 +25,9 @@ router.route('/reset-password').post(resetPasswordController);
 
 router.route('/logout').post(authMiddleware, logoutController);
 
-router.route('/update-profile/:id').patch(authMiddleware, updateProfileController);
+router
+  .route('/update-profile/:id')
+  .patch(authMiddleware, updateProfileController)
+  .delete(authMiddleware, removeProfilePictureController);
 
 export default router;

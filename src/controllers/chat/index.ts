@@ -121,13 +121,46 @@ const getAllChatsController = async (_: Request, res: Response) => {
   })
 };
 
-const getAvailableUsersController = async (_: Request, res: Response) => {
+const getAvailableUsersController = async (req: Request, res: Response) => {
+  let { type, search } = req.query;
+
+  const searchQuery = {
+    name: {
+      $regex: search,
+      $options: 'i',
+    },
+    phoneNumber: {
+      $regex: search,
+      $options: 'i',
+    },
+    email: {
+      $regex: search,
+      $options: 'i',
+    },
+    username: {
+      $regex: search,
+      $options: 'i',
+    },
+  };
+
+  type searchKeys = keyof typeof searchQuery;
+  
+
   const users = await User.aggregate([
     {
       $match: {
-        _id: {
-          $ne: new Types.ObjectId(res.locals.user._id),
-        },
+        $and: [
+          {
+            _id: {
+              $ne: new Types.ObjectId(res.locals.user._id),
+            },
+          },
+          {
+            [type as string]: {
+              ...searchQuery[type as searchKeys]
+            }
+          }
+        ],
       },
     },
     {
@@ -167,22 +200,22 @@ const createOrAccessChatController = async (req: Request, res: Response) => {
           {
             users: {
               $elemMatch: {
-                $eq: userId
-              }
-            }
+                $eq: new Types.ObjectId(userId),
+              },
+            },
           },
           {
             users: {
               $elemMatch: {
-                $eq: receiverId
-              }
-            }
-          }
-        ]
-      }
+                $eq: new Types.ObjectId(receiverId),
+              },
+            },
+          },
+        ],
+      },
     },
-    ...chatCommonAggregation(false)
-  ])
+    ...chatCommonAggregation(false),
+  ]);
 
   if(chat.length) {
     return res.status(StatusCodes.OK).json({
@@ -212,7 +245,7 @@ const createOrAccessChatController = async (req: Request, res: Response) => {
 
   return res.status(StatusCodes.CREATED).json({
     status: 'success',
-    message: 'New Chat Established',
+    message: 'New Chat created successfully',
     chat: chat[0]
   });
 };

@@ -13,6 +13,10 @@ import cors from "cors";
 // ? A MW to extract CLient IP
 import requestIP from 'request-ip';
 
+// * File Upload MW's
+import fileUpload from "express-fileupload";
+import '@/utils/Cloudinary';
+
 // * Custom Middleware's
 import notFoundMiddleware from './middlewares/notFound.middleware';
 import errorHandlerMiddleware from './middlewares/errorHandler.middleware';
@@ -53,6 +57,7 @@ app.use(express.static(path.join(__dirname, '../public')));
 // * Applying Middlewares
 app.use(requestIP.mw());
 app.use(express.json({ limit: '16kb' }));
+app.use(fileUpload({ useTempFiles: true }))
 app.use(express.urlencoded({ extended: true, limit: '16kb' }));
 app.use(cookieParser(process.env.JWT_SECRET))
 if(process.env.NODE_ENV) {

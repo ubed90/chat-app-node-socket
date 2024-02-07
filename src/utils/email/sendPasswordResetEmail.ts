@@ -8,7 +8,7 @@ type PasswordReset = {
 }
 
 const sendPasswordResetEmail = ({ email, name, token }: PasswordReset) => {
-  const passwordResetURL = `${process.env.ORIGIN}/auth/reset-password?token=${token}&email=${email}`;
+  const passwordResetURL = `${process.env.ORIGIN}/reset-password?token=${token}&email=${email}`;
 
   const subject = '📍 Password Reset - ChatsUP';
 

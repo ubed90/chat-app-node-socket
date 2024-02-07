@@ -75,7 +75,8 @@ const sendMessageController = async (req: Request, res: Response) => {
   const { chatId } = req.params;
   const { content } = req.body;
 
-  if (!chatId || !content) throw new BadRequestError('Invalid request');
+  if (!chatId) throw new BadRequestError('Invalid request');
+  if (!content) throw new BadRequestError('Message field cannot be empty.');
 
   const chat = await Chat.findOne({
     _id: chatId,

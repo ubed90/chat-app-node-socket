@@ -36,7 +36,7 @@ const schema = new Schema<IChat, ChatModel, IChatMethods>({
         type: Schema.Types.ObjectId,
         ref: 'Message'
     }
-});
+}, { timestamps: true });
 
 // * Pre Delete Hook
 schema.pre('deleteOne', { document: true },async function() {

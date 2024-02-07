@@ -3,7 +3,7 @@ import sendEmail, { Person } from "./sendEmail";
 import getTemplate from "./template";
 
 const sendVerificationEmail = (user: IUser) => {
-    const verifyEmailURL = `${process.env.ORIGIN}/auth/verify-email?token=${user.verificationToken}&email=${user.email}`;
+    const verifyEmailURL = `${process.env.ORIGIN}/verify-email?token=${user.verificationToken}&email=${user.email}`;
 
     const subject = 'Verification Required 🚫'
 

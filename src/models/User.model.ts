@@ -2,14 +2,16 @@ import { Model, Schema, model } from 'mongoose';
 import validator from 'validator';
 import bcrypt from 'bcryptjs';
 import Token, { IToken } from './Token.model';
+import ProfilePicture, { IProfilePicture } from './ProfilePicture.model';
 
 export interface IUser {
   _id?: string;
   name: string;
   email: string;
   username: string;
-  profilePicture?: string;
+  profilePicture?: IProfilePicture;
   password: string;
+  phoneNumber?: string;
   isAdmin?: boolean;
   isVerified?: boolean;
   verifiedOn?: Date;
@@ -58,6 +60,14 @@ const schema = new Schema<IUser, UserModel, IUserMethods>(
       minlength: [3, 'Username Should be minimum of 3 Characters'],
       maxlength: [15, 'Username Should be maximum of 15 Characters'],
     },
+    phoneNumber: {
+      type: String,
+      unique: true,
+      trim: true,
+      minlength: [10, 'Phone number should be min of 10 characters'],
+      maxlength: [10, 'Phone number can be max of 10 characters'],
+      default: undefined
+    },
     isAdmin: {
       type: Boolean,
       default: false,
@@ -87,7 +97,7 @@ const schema = new Schema<IUser, UserModel, IUserMethods>(
     },
     passwordToken: String,
     passwordTokenExpirationDate: Date,
-    profilePicture: String,
+    profilePicture: ProfilePicture,
     verificationToken: String,
     verifiedOn: Date,
     tokens: [Token],

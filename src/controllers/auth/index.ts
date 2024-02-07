@@ -10,6 +10,9 @@ import crypto from 'crypto';
 import { sendPasswordResetEmail, sendVerificationEmail } from '@/utils/email';
 import { attachCookiesToResponse, createToken, hashString, isTokenValid } from '@/utils';
 import { StatusCodes } from 'http-status-codes';
+import { UploadedFile } from 'express-fileupload';
+import ImageService from '@/utils/Cloudinary';
+import { IProfilePicture } from '@/models/ProfilePicture.model';
 
 const registerController = async (req: Request, res: Response) => {
   const { name, email, password, profilePicture, username } = req.body;
@@ -49,9 +52,9 @@ const registerController = async (req: Request, res: Response) => {
 };
 
 const verifyEmailController = async (req: Request, res: Response) => {
-  const { verificationToken, email } = req.query;
+  const { token, email } = req.query;
 
-  if (!verificationToken || !email) throw new BadRequestError();
+  if (!token || !email) throw new BadRequestError();
 
   const user = await User.findOne({ email });
 
@@ -59,10 +62,10 @@ const verifyEmailController = async (req: Request, res: Response) => {
 
   if (user.isVerified)
     return res
-      .status(200)
+      .status(StatusCodes.BAD_REQUEST)
       .json({ status: 'success', message: 'User Already Verified' });
 
-  if (user.verificationToken !== verificationToken)
+  if (user.verificationToken !== token)
     throw new UnauthorizedError('Invalid verification token');
 
   user.isVerified = true;
@@ -138,15 +141,14 @@ const loginController = async (req: Request, res: Response) => {
     status: 'success',
     user: {
       ...user.toJSON(),
-      profilePicture: user.profilePicture,
+      phoneNumber: user.phoneNumber,
+      profilePicture: user.profilePicture?.url,
     },
   });
 };
 
 const logoutController = async (req: Request, res: Response) => {
   const { refreshToken } = req.signedCookies;
-
-  console.log(res.locals);
 
   const user = await User.findOne({ _id: res.locals.user._id });
 
@@ -161,14 +163,16 @@ const logoutController = async (req: Request, res: Response) => {
   res.cookie('accessToken', 'logout', {
     httpOnly: true,
     signed: true,
-    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'development' ? true : 'none',
+    secure: process.env.NODE_ENV === 'development' ? false : true, 
     expires: new Date(Date.now()),
   });
 
   res.cookie('refreshToken', 'logout', {
     httpOnly: true,
     signed: true,
-    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'development' ? true : 'none',
+    secure: process.env.NODE_ENV === 'development' ? false : true, 
     expires: new Date(Date.now()),
   });
 
@@ -253,7 +257,7 @@ const resetPasswordController = async (req: Request, res: Response) => {
 };
 
 const updateProfileController = async (req: Request, res: Response) => {
-  const { name, email, username } = req.body;
+  const { name, email, username, phoneNumber } = req.body;
 
   const { id: _id } = req.params;
 
@@ -263,16 +267,68 @@ const updateProfileController = async (req: Request, res: Response) => {
 
   if(!user || _id !== res.locals.user._id) throw new UnauthorizedError('Not authorized to update user profile');
 
+  let profilePicture: IProfilePicture | undefined = undefined;
+
+  if (req?.files) {
+    const { secure_url, public_id } = await ImageService.uploadImage({
+      file: req.files.profilePicture as UploadedFile,
+      upload_folder: user.email,
+    });
+
+    profilePicture = { public_id, url: secure_url }
+  }
+
   user.name = name || user.name;
   user.email = email || user.email;
   user.username = username || user.username;
+  user.phoneNumber = phoneNumber || user?.phoneNumber;
+
+  if(profilePicture) {
+    if(user?.profilePicture) {
+      // ! Delete Previous Image Logic
+      await ImageService.deleteImage(user);
+    }
+    user.profilePicture = profilePicture;
+  }
 
   await user.save();
 
   return res.status(StatusCodes.OK).json({
     status: 'success',
-    message: 'Profile Updated Successfully 🚀'
+    message: 'Profile Updated Successfully 🚀',
+    user: {
+      ...user.toJSON(),
+      profilePicture: user?.profilePicture?.url,
+      phoneNumber: user?.phoneNumber
+    }
   })
+}
+
+const removeProfilePictureController = async (req: Request, res: Response) => {
+  const { id: _id } = req.params;
+
+  if (!_id)
+    throw new BadRequestError();
+
+  const user = await User.findOne({ _id: res.locals.user._id });
+
+  if (!user || _id !== res.locals.user._id)
+    throw new UnauthorizedError('Not authorized to update user profile');
+
+  await ImageService.deleteImage(user);
+
+  user.profilePicture = undefined;
+
+  await user.save();
+
+  return res.status(StatusCodes.OK).json({
+    status: 'success',
+    message: 'Profile picture deleted successfully.',
+    user: {
+      ...user.toJSON(),
+      phoneNumber: user?.phoneNumber,
+    },
+  });
 }
 
 export {
@@ -283,4 +339,5 @@ export {
   forgotPasswordController,
   resetPasswordController,
   updateProfileController,
+  removeProfilePictureController
 };

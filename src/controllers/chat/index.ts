@@ -48,6 +48,7 @@ const chatCommonAggregation = (isGroupChat = true): PipelineStage[] => {
                     profilePicture: 1,
                     name: 1,
                     username: 1,
+                    phoneNumber: 1
                   }
                 }
               ]
@@ -80,7 +81,8 @@ const chatCommonAggregation = (isGroupChat = true): PipelineStage[] => {
               name: 1,
               email: 1,
               username: 1,
-              profilePicture: 1
+              profilePicture: 1,
+              phoneNumber: 1
             }
           }
         ]
@@ -169,9 +171,14 @@ const getAvailableUsersController = async (req: Request, res: Response) => {
         username: 1,
         name: 1,
         profilePicture: 1,
+        phoneNumber: 1,
       },
     },
   ]);
+
+  console.log(type, search);
+  console.log(users);
+  
 
 
   return res.status(StatusCodes.OK).json({
@@ -485,7 +492,6 @@ const leaveGroupChatController = async (req: Request, res: Response) => {
   return res.status(StatusCodes.OK).json({
     status: 'success',
     message: `You Left group ${updatedChat?.name} successfully`,
-    chat: chat[0],
   });
 };
 

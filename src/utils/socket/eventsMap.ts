@@ -1,6 +1,6 @@
 const CONNECTED_EVENT = 'connected'
 
-const DISCONNECT_EVENT = 'disconnect';
+const DISCONNECT_EVENT = 'disconnected';
 
 const JOIN_CHAT_EVENT = 'joinChat';
 
@@ -20,7 +20,7 @@ const TYPING_EVENT = "typing";
 
 enum CHAT_EVENTS {
   connected = CONNECTED_EVENT,
-  disconnect = DISCONNECT_EVENT,
+  disconnected = DISCONNECT_EVENT,
   joinChat = JOIN_CHAT_EVENT,
   leaveChat = LEAVE_CHAT_EVENT,
   updateGroupName = UPDATE_GROUP_NAME_EVENT,
@@ -28,7 +28,7 @@ enum CHAT_EVENTS {
   newChat = NEW_CHAT_EVENT,
   error = SOCKET_ERROR_EVENT,
   stopTyping = STOP_TYPING_EVENT,
-  startTyping = TYPING_EVENT
+  startTyping = TYPING_EVENT,
 }
 
 export default CHAT_EVENTS;

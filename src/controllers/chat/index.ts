@@ -1,5 +1,7 @@
 import { BadRequestError, CustomApiError, NotFoundError, UnauthorizedError } from '@/errors';
 import { Chat, User } from '@/models';
+import { CHAT_EVENTS } from '@/utils/socket';
+import { emitSocketEvent } from '@/utils/socket/socketEvents';
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { PipelineStage, Types } from 'mongoose';
@@ -248,7 +250,8 @@ const createOrAccessChatController = async (req: Request, res: Response) => {
 
   if(!chat[0]) throw new CustomApiError('Internal Server Error', StatusCodes.INTERNAL_SERVER_ERROR);
   console.log(chat);
-  
+
+  emitSocketEvent(req, receiverId, CHAT_EVENTS.newChat, chat[0]);
 
   return res.status(StatusCodes.CREATED).json({
     status: 'success',

@@ -1,5 +1,7 @@
 import { BadRequestError, CustomApiError, NotFoundError } from "@/errors";
 import { Chat, Message } from "@/models";
+import { CHAT_EVENTS } from "@/utils/socket";
+import { emitSocketEvent } from "@/utils/socket/socketEvents";
 import { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import { PipelineStage, Types } from "mongoose";
@@ -109,6 +111,12 @@ const sendMessageController = async (req: Request, res: Response) => {
   ]);
 
   if(!message[0]) throw new CustomApiError('Internal server error', 500);
+  
+  chat.users.forEach((user) => {
+    if(user._id.toString() === res.locals.user._id) return;
+
+    emitSocketEvent(req, user._id.toString(), CHAT_EVENTS.onMessage, message[0])
+  })
 
   return res.status(StatusCodes.CREATED).json({
     status: 'success',

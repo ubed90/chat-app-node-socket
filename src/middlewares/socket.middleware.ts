@@ -1,6 +1,7 @@
 import { Socket } from 'socket.io';
 import { ExtendedError } from 'socket.io/dist/namespace';
-import cookie from 'cookie';
+import cookieParser from 'cookie-parser';
+import cookie from "cookie";
 import {
   NotFoundError,
   UnauthenticatedError,
@@ -17,14 +18,23 @@ const authorizeSocketMiddleware = async (
   next: SocketNextFunction
 ) => {
   try {
-    console.log("HELLO FROM SOCKET MIDDLEWARE", socket.handshake);
-    const cookies = cookie.parse(socket.handshake.headers.cookie || '');
+    // console.log("HELLO FROM SOCKET MIDDLEWARE", socket.handshake.headers.cookie);
+    const parsedCookies = cookie.parse(socket.handshake.headers.cookie || '');
+
+    const cookies = cookieParser.signedCookies(
+      parsedCookies,
+      process.env.JWT_SECRET as string
+    );
+
+    // console.log(cookies);
 
     let token = cookies?.accessToken;
 
     if (!token) {
       token = socket.handshake.auth?.token;
     }
+
+    // console.log(token);
 
     if (!token)
       throw new UnauthorizedError('Un-authorized handshake. Token is missing');

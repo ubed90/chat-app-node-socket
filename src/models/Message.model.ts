@@ -5,6 +5,7 @@ interface IMessage {
     sender: Types.ObjectId;
     content: string;
     chat: Types.ObjectId,
+    isNotification?: boolean;
 }
 
 interface IMessageMethods {}
@@ -23,6 +24,10 @@ const schema = new Schema<IMessage, MessageModel, IMessageMethods>({
     sender: {
         type: Schema.Types.ObjectId,
         ref: 'User'
+    },
+    isNotification: {
+        type: Boolean,
+        default: false
     }
 }, {
     timestamps: true

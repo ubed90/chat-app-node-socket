@@ -3,6 +3,7 @@ import {
   createGroupChatController,
   createOrAccessChatController,
   deleteChatController,
+  deleteGroupChatController,
   getAllChatsController,
   getAvailableUsersController,
   getGroupChatDetailsController,
@@ -30,6 +31,8 @@ router
   .post(createGroupChatController)
   .patch(renameGroupChatController)
   .delete(leaveGroupChatController);
+
+router.route('/group/delete').delete(deleteGroupChatController);
 
 router
   .route('/group/:groupId')

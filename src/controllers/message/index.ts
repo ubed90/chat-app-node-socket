@@ -115,7 +115,10 @@ const sendMessageController = async (req: Request, res: Response) => {
   chat.users.forEach((user) => {
     if(user._id.toString() === res.locals.user._id) return;
 
-    emitSocketEvent(req, user._id.toString(), CHAT_EVENTS.onMessage, message[0])
+    emitSocketEvent(req, user._id.toString(), CHAT_EVENTS.onMessage, {
+      newMessage: message[0],
+      chat: chat
+    });
   })
 
   return res.status(StatusCodes.CREATED).json({

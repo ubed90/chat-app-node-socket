@@ -4,7 +4,7 @@ const DISCONNECT_EVENT = 'disconnected';
 
 const JOIN_CHAT_EVENT = 'joinChat';
 
-const LEAVE_CHAT_EVENT = "leaveChat";
+const DELETE_CHAT_EVENT = "deleteChat";
   // ? when admin updates a group name
 const UPDATE_GROUP_NAME_EVENT = "updateGroupName";
 // ? when new message is received
@@ -18,17 +18,25 @@ const STOP_TYPING_EVENT = "stopTyping";
 // ? when participant starts typing
 const TYPING_EVENT = "typing";
 
+// ? when participant is Added to Group
+const ADD_TO_GROUP_EVENT = "addToGroup";
+
+// ? when participant is REMOVED to Group
+const REMOVE_FROM_GROUP_EVENT = "removeFromGroup";
+
 enum CHAT_EVENTS {
   connected = CONNECTED_EVENT,
   disconnected = DISCONNECT_EVENT,
   joinChat = JOIN_CHAT_EVENT,
-  leaveChat = LEAVE_CHAT_EVENT,
+  deleteChat = DELETE_CHAT_EVENT,
   updateGroupName = UPDATE_GROUP_NAME_EVENT,
   onMessage = MESSAGE_RECEIVED_EVENT,
   newChat = NEW_CHAT_EVENT,
   error = SOCKET_ERROR_EVENT,
   stopTyping = STOP_TYPING_EVENT,
   startTyping = TYPING_EVENT,
+  addToGroup = ADD_TO_GROUP_EVENT,
+  removeFromGroup = REMOVE_FROM_GROUP_EVENT,
 }
 
 export default CHAT_EVENTS;

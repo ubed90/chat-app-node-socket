@@ -23,12 +23,32 @@ const ImageService = {
       throw new BadRequestError('Only JPG/JPEG/PNG files are allowed.');
     }
 
-    const maxSize = 1024 * 1024 * 2;
+    const maxSize = 1024 * 1024;
 
     if (file.size > maxSize)
-      throw new BadRequestError('Please upload image under 2MB');
+      throw new BadRequestError('Please upload image under 1MB');
 
     const result = await Cloudinary.uploader.upload(file.tempFilePath, {
+      filename_override: file.name.replace(/\.(jpg|jpeg|png)$/, ''),
+      folder: `chatsUP/${upload_folder}`,
+    });
+
+    fs.unlinkSync(file.tempFilePath);
+
+    return result;
+  },
+  uploadVideo: async ({ file, upload_folder }: UploadImageArgs) => {
+    if ((!file.mimetype.startsWith('video/')) && (!file.mimetype.match(/(mp4|mov|webm)$/))) {
+      throw new BadRequestError('Only MP4/MOV/WEBM files are allowed.');
+    }
+
+    const maxSize = 1024 * 1024 * 5;
+
+    if (file.size > maxSize)
+      throw new BadRequestError('Please upload Video under 5MB');
+
+    const result = await Cloudinary.uploader.upload(file.tempFilePath, {
+      resource_type: 'video',
       filename_override: file.name.replace(/\.(jpg|jpeg|png)$/, ''),
       folder: `chatsUP/${upload_folder}`,
     });

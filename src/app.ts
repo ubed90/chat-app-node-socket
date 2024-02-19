@@ -30,6 +30,9 @@ import { Server } from 'socket.io';
 import authorizeSocketMiddleware from './middlewares/socket.middleware';
 import initializeSocketIO from './utils/socket/initializeSocketIO';
 import path from 'path';
+import { usersRegistry } from './utils/usersMap';
+
+// * Global Online Registry
 
 const PORT = process.env.PORT || 3000;
 
@@ -61,7 +64,6 @@ app.use(fileUpload({ useTempFiles: true }))
 app.use(express.urlencoded({ extended: true, limit: '16kb' }));
 app.use(cookieParser(process.env.JWT_SECRET))
 if(process.env.NODE_ENV) {
-    console.log(process.env.ORIGIN)
     app.use(
       cors({
         origin: process.env.ORIGIN,
@@ -84,7 +86,7 @@ app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
 
 // * Initialize our SocketIo
-initializeSocketIO({ io });
+initializeSocketIO({ io, usersRegistry });
 
 
 const start = async () => {

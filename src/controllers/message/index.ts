@@ -9,6 +9,7 @@ import { UploadedFile } from 'express-fileupload';
 import { StatusCodes } from 'http-status-codes';
 import { PipelineStage, Types } from 'mongoose';
 import fs from 'fs';
+import { usersRegistry } from '@/utils/usersMap';
 
 const messagesCommonAggregation = (): PipelineStage[] => {
   return [
@@ -70,10 +71,21 @@ const getAllChatMessagesController = async (req: Request, res: Response) => {
     },
   ]);
 
+  const isOnline =
+    chat.isGroupChat ||
+    chat.users.length > 2 ||
+    usersRegistry.getUserStatus(
+      chat.users
+        .filter((user) => user._id.toString() !== res.locals.user._id)[0]
+        .toString()
+    );
+    
+
   return res.status(200).json({
     status: 'success',
     message: 'Messages fetched successfully',
     messages: allMessages,
+    isOnline 
   });
 };
 
@@ -182,7 +194,8 @@ const sendAttachmentController = async (req: Request, res: Response) => {
   } else if (file.mimetype.includes('pdf')) {
     const maxDocSize = 1024 * 1024 * 2;
 
-    if(file.size > maxDocSize) throw new BadRequestError('Please upload PDF under 2MB');
+    if (file.size > maxDocSize)
+      throw new BadRequestError('Please upload PDF under 2MB');
 
     messagePayload['attachment'] = {
       type: 'PDF',
@@ -216,13 +229,11 @@ const sendAttachmentController = async (req: Request, res: Response) => {
     });
   });
 
-  return res
-    .status(StatusCodes.OK)
-    .json({
-      status: 'success',
-      message: 'File Uploaded Successfully.',
-      newMessage: message[0],
-    });
+  return res.status(StatusCodes.OK).json({
+    status: 'success',
+    message: 'File Uploaded Successfully.',
+    newMessage: message[0],
+  });
 };
 
 export {

@@ -24,6 +24,12 @@ const ADD_TO_GROUP_EVENT = "addToGroup";
 // ? when participant is REMOVED to Group
 const REMOVE_FROM_GROUP_EVENT = "removeFromGroup";
 
+// ? User Disconnected
+const USER_DISCONNECTED = "userDisconnected"
+
+// ? User COnnected
+const USER_CONNECTED = "userConnected"
+
 enum CHAT_EVENTS {
   connected = CONNECTED_EVENT,
   disconnected = DISCONNECT_EVENT,
@@ -37,6 +43,8 @@ enum CHAT_EVENTS {
   startTyping = TYPING_EVENT,
   addToGroup = ADD_TO_GROUP_EVENT,
   removeFromGroup = REMOVE_FROM_GROUP_EVENT,
+  userDisconnected = USER_DISCONNECTED,
+  userConnected = USER_CONNECTED,
 }
 
 export default CHAT_EVENTS;

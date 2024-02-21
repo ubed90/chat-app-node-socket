@@ -79,13 +79,12 @@ const getAllChatMessagesController = async (req: Request, res: Response) => {
         .filter((user) => user._id.toString() !== res.locals.user._id)[0]
         .toString()
     );
-    
 
   return res.status(200).json({
     status: 'success',
     message: 'Messages fetched successfully',
     messages: allMessages,
-    isOnline 
+    isOnline,
   });
 };
 
@@ -201,12 +200,26 @@ const sendAttachmentController = async (req: Request, res: Response) => {
       type: 'PDF',
       content: fs.readFileSync(file.tempFilePath),
     };
+  } else if (file.mimetype.includes('mp3')) {
+    const maxAudioSize = 1024 * 1024 * 1;
+
+    if (file.size > maxAudioSize)
+      throw new BadRequestError('Audio message size limit is 1MB');
+
+    messagePayload['attachment'] = {
+      type: 'AUDIO',
+      content: fs.readFileSync(file.tempFilePath),
+    };
   }
 
   const newMessage = await Message.create(messagePayload);
 
+  if (file.mimetype.includes('pdf') || file.mimetype.includes('mp3')) {
+    fs.unlinkSync(file.tempFilePath);
+  }
+  
   chat.lastMessage = new Types.ObjectId(newMessage._id);
-
+  
   await chat.save();
 
   const message = await Message.aggregate([
@@ -229,7 +242,7 @@ const sendAttachmentController = async (req: Request, res: Response) => {
     });
   });
 
-  return res.status(StatusCodes.OK).json({
+  return res.status(StatusCodes.CREATED).json({
     status: 'success',
     message: 'File Uploaded Successfully.',
     newMessage: message[0],

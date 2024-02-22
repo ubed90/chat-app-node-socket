@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 export interface IAttachment {
-    type: "IMAGE" | "VIDEO" | "PDF";
+    type: "IMAGE" | "VIDEO" | "PDF" | "AUDIO";
     url?: string
     content?: Buffer
     public_id?: string;
@@ -10,7 +10,7 @@ export interface IAttachment {
 const Attachment = new mongoose.Schema<IAttachment>({
     type: {
         type: String,
-        enum: ['IMAGE', 'VIDEO', 'PDF'],
+        enum: ['IMAGE', 'VIDEO', 'PDF', 'AUDIO'],
         required: [true, 'Attachment type is required']
     },
     url: String,

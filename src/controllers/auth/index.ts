@@ -147,6 +147,72 @@ const loginController = async (req: Request, res: Response) => {
   });
 };
 
+const autoLoginController = async (req: Request, res: Response) => {
+  const { email } = req.body;
+
+  if (!email)
+    throw new BadRequestError('Email is requried');
+
+  const user = await User.findOne({ email });
+
+  if (!user) throw new NotFoundError(`No user found with email: ${email}`);
+
+  const existingToken = user.tokens?.find(
+    (token) =>
+      token.ip === req.clientIp && token.userAgent === req.headers['user-agent']
+  );
+  let refreshToken;
+
+  try {
+    if (existingToken && isTokenValid({ token: existingToken.refreshToken })) {
+      refreshToken = existingToken.refreshToken;
+    } else {
+      refreshToken = createToken({
+        payload: user.toJSON(),
+        isAccessToken: false,
+      });
+
+      const token = {
+        ip: req.clientIp,
+        userAgent: req.headers['user-agent'],
+        refreshToken,
+      };
+
+      user.tokens?.push(token);
+    }
+  } catch (error) {
+    refreshToken = createToken({
+      payload: user.toJSON(),
+      isAccessToken: false,
+    });
+
+    const token = {
+      ip: req.clientIp,
+      userAgent: req.headers['user-agent'],
+      refreshToken,
+    };
+
+    user.tokens = user.tokens?.filter(
+      (token) => token.refreshToken === existingToken?.refreshToken
+    );
+    user.tokens?.push(token);
+  }
+
+  await user.save();
+
+  attachCookiesToResponse({ res, user: user.toJSON(), refreshToken });
+
+  return res.status(StatusCodes.OK).json({
+    status: 'success',
+    message: 'Login Successful 🚀.',
+    user: {
+      ...user.toJSON(),
+      phoneNumber: user.phoneNumber,
+      profilePicture: user.profilePicture?.url,
+    },
+  });
+}
+
 const logoutController = async (req: Request, res: Response) => {
   const { refreshToken } = req.signedCookies;
 
@@ -335,6 +401,7 @@ export {
   registerController,
   verifyEmailController,
   loginController,
+  autoLoginController,
   logoutController,
   forgotPasswordController,
   resetPasswordController,

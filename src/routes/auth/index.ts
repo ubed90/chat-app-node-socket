@@ -1,5 +1,6 @@
 import express from 'express';
 import {
+  autoLoginController,
   forgotPasswordController,
   loginController,
   logoutController,
@@ -14,6 +15,8 @@ import authMiddleware from '@/middlewares/auth.middleware';
 const router = express.Router();
 
 router.route('/login').post(loginController);
+
+router.route('/auto-login').post(autoLoginController);
 
 router.route('/register').post(registerController);
 

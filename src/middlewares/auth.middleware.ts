@@ -24,6 +24,8 @@ const authMiddleware = async (req: Request, res: Response, next: NextFunction) =
         console.log(payload);
         
         user = await User.findOne({ _id: payload._id, 'tokens.refreshToken': refreshToken });
+
+        console.log(user);
         
         if (!user)
           throw new UnauthenticatedError('Session Expired. Please login again');

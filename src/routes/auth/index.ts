@@ -1,6 +1,7 @@
 import express from 'express';
 import {
   autoLoginController,
+  changePasswordController,
   forgotPasswordController,
   loginController,
   logoutController,
@@ -32,5 +33,7 @@ router
   .route('/update-profile/:id')
   .patch(authMiddleware, updateProfileController)
   .delete(authMiddleware, removeProfilePictureController);
+
+router.route('/change-password').post(authMiddleware, changePasswordController);
 
 export default router;

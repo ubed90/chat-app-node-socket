@@ -33,18 +33,26 @@ const getTemplate = ({
 
 		h1 {
 			font-size: 24px;
-			margin-top: 0;
+			margin-block: 0;
 			text-align: center;
 		}
-
-		p {
-			margin-bottom: 20px;
+		
+		.greetings {
+		  margin-bottom: 0px;
+		}
+		
+		.name {
+		  font-size: 18px;
+		}
+		
+		.green {
+		  color: green;
 		}
 
 		.button {
 			display: inline-block;
-			background-color: #4CAF50;
-			color: #ffffff;
+			background-color: green;
+			color: white !important;
 			text-align: center;
 			padding: 10px 20px;
 			text-decoration: none;
@@ -55,7 +63,7 @@ const getTemplate = ({
 			background-color: tomato;
 		}
 
-		.button:hover {
+		.button:not(.alert):hover {
 			background-color: #3e8e41;
 		}
 
@@ -63,9 +71,13 @@ const getTemplate = ({
 			font-size: 12px;
 			color: #999999;
 			text-align: center;
-			margin-top: 50px;
-			padding-top: 20px;
+			margin-top: 30px;
 			border-top: 1px solid #cccccc;
+		}
+		
+		.welcome-text {
+		  margin-block: 0;
+		  margin-top: 10px;
 		}
 
 		.note {
@@ -77,14 +89,30 @@ const getTemplate = ({
 		.note.alert {
 			color: tomato;
 		}
+		
+		.password {
+		  display: inline-block;
+		  font-weight: bold;
+		  padding: 5px 10px;
+		  background-color: green;
+		  border-radius: 10px;
+		  color: white;
+		}
+
+		.greetings-name {
+		  font-size: 0.9em;
+		}
 	</style>
 </head>
 <body>
 	<div class="container">
 		<h1>${heading}</h1>
-		<p>Hello <strong>${name.toUpperCase()}</strong>,</p>
+		<p class="greetings">Hello <strong class="name green">${name.toUpperCase()}</strong>,</p>
 		${content}
-		</div>
+		<p class="greetings">
+		  Thanks and Regards,<br />
+		  <strong class="greetings-name">ChatsUP Admin 📢</strong>
+		</p>
 		<div class="footer">
 			<p>This email was sent to ${email.toLowerCase()} because you made a transaction with us.</p>
 		</div>

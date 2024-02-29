@@ -26,10 +26,10 @@ const mountParticipantStoppedTypingEvent = (socket: Socket) => {
 const mountCallInitiatedEvent = (socket: Socket) => {
   socket.on(
     CALL_EVENTS.callInitiated,
-    async ({ caller, receiver, roomId }, isUserOnline: (isOnline: boolean) => void) => {
+    async ({ caller, receiver, roomId, callType }, isUserOnline: (isOnline: boolean) => void) => {
       const isOnline = usersRegistry.getUserStatus(receiver as string);
       socket.broadcast
-        .in(receiver).emit(CALL_EVENTS.callOfferReceived, { caller, roomId });
+        .in(receiver).emit(CALL_EVENTS.callOfferReceived, { caller, roomId, callType });
 
       // let acceptedTheInvite = false;
       // if(isOnline) {
@@ -49,10 +49,10 @@ const mountCallInitiatedEvent = (socket: Socket) => {
 };
 
 const mountCallJoinEvent = (socket: Socket) => {
-  socket.on(CALL_EVENTS.callJoined, (callRoomId, userId) => {
-    console.log(userId + ' JOINED ROOM :: ', callRoomId);
+  socket.on(CALL_EVENTS.callJoined, (callRoomId, user) => {
+    console.log(user.name + ' JOINED ROOM :: ', callRoomId);
     socket.join(callRoomId)
-    socket.in(callRoomId).emit(CALL_EVENTS.callConnected, userId)
+    socket.in(callRoomId).emit(CALL_EVENTS.callConnected, user)
   })
 }
 

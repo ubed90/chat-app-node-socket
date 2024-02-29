@@ -32,7 +32,8 @@ import initializeSocketIO from './utils/socket/initializeSocketIO';
 import path from 'path';
 import { usersRegistry } from './utils/usersMap';
 
-// * Global Online Registry
+// * PeerJS Imports
+import { ExpressPeerServer } from "peer";
 
 const PORT = process.env.PORT || 3000;
 
@@ -41,12 +42,18 @@ const app = express();
 
 // ! Initialize Sockets
 const httpServer = createServer(app);
-const io = new Server(httpServer, {
+export const io = new Server(httpServer, {
     pingTimeout: 60000,
     cors: {
         origin: process.env.ORIGIN,
         credentials: true,
     }
+});
+
+// * Initialize our Peer Server
+const peerServer = ExpressPeerServer(httpServer, {
+    port: Number(PORT),
+    path: '/video-call',
 })
 
 // * Set Socket Auth MW
@@ -75,9 +82,7 @@ if(process.env.NODE_ENV) {
 }
 
 // * Routes
-app.get('/', (_, res) => {
-    return res.status(200).send("<h1>APP IS WORKING</h1>")
-})
+app.use('/peerjs', peerServer);
 
 app.use('/api/v1', appRoutes)
 

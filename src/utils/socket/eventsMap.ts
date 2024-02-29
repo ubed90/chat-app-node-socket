@@ -30,6 +30,30 @@ const USER_DISCONNECTED = "userDisconnected"
 // ? User COnnected
 const USER_CONNECTED = "userConnected"
 
+// ? Call Initialted
+const CALL_INITIATED = "callInitiated"
+
+// ? Call Request Received
+const CALL_OFFER_RECEIVED = "callOfferReceived"
+
+// ? Call Room Joined
+const CALL_JOINED = "callJoined"
+
+// ? Call Room Joined
+const CALL_CONNECTED = "callConnected"
+
+// ? Call Room Joined
+const CALL_REJECTED = "callRejected"
+
+// ? Call Room Joined
+const TOGGLE_AUDIO = "toggleAudio"
+
+// ? Call Room Joined
+const TOGGLE_VIDEO = "toggleVideo"
+
+// ? User Hangsup the Call
+const USER_HANG_UP = "userHangUp"
+
 enum CHAT_EVENTS {
   connected = CONNECTED_EVENT,
   disconnected = DISCONNECT_EVENT,
@@ -45,6 +69,17 @@ enum CHAT_EVENTS {
   removeFromGroup = REMOVE_FROM_GROUP_EVENT,
   userDisconnected = USER_DISCONNECTED,
   userConnected = USER_CONNECTED,
+}
+
+export enum CALL_EVENTS {
+  callInitiated = CALL_INITIATED,
+  callOfferReceived = CALL_OFFER_RECEIVED,
+  callJoined = CALL_JOINED,
+  callConnected = CALL_CONNECTED,
+  callRejected = CALL_REJECTED,
+  toggleAudio = TOGGLE_AUDIO,
+  toggleVideo = TOGGLE_VIDEO,
+  userHangUp = USER_HANG_UP
 }
 
 export default CHAT_EVENTS;

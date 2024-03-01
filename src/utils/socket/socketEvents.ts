@@ -49,11 +49,11 @@ const mountCallInitiatedEvent = (socket: Socket) => {
 };
 
 const mountCallJoinEvent = (socket: Socket) => {
-  socket.on(CALL_EVENTS.callJoined, (callRoomId, user) => {
-    console.log(user.name + ' JOINED ROOM :: ', callRoomId);
-    socket.join(callRoomId)
-    socket.in(callRoomId).emit(CALL_EVENTS.callConnected, user)
-  })
+  socket.on(CALL_EVENTS.callJoined, ({ roomId, user, peerId }) => {
+    console.log(user.name + ' JOINED ROOM :: ', roomId);
+    socket.join(roomId);
+    socket.in(roomId).emit(CALL_EVENTS.callConnected, { user, peerId });
+  });
 }
 
 const mountCallRejectedEvent = (socket: Socket) => {

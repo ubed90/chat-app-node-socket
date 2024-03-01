@@ -2,7 +2,6 @@ import { Socket } from 'socket.io';
 import CHAT_EVENTS, { CALL_EVENTS } from './eventsMap';
 import { Request } from 'express';
 import { usersRegistry } from '../usersMap';
-import { IUser } from '@/models/User.model';
 
 const mountJoinChatEvent = (socket: Socket) => {
   socket.on(CHAT_EVENTS.joinChat, (chatId: string) => {

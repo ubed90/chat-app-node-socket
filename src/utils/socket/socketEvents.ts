@@ -25,10 +25,16 @@ const mountParticipantStoppedTypingEvent = (socket: Socket) => {
 const mountCallInitiatedEvent = (socket: Socket) => {
   socket.on(
     CALL_EVENTS.callInitiated,
-    async ({ caller, receiver, roomId, callType }, isUserOnline: (isOnline: boolean) => void) => {
-      const isOnline = usersRegistry.getUserStatus(receiver as string);
+    async ({ caller, receiver, roomId, callType, groupName }, isUserOnline: (isOnline: boolean) => void) => {
+      
+      let isOnline = false;
+      
+      for(let i = 0; i < receiver.length && !isOnline; i++) {
+        isOnline = usersRegistry.getUserStatus(receiver[i]);
+      }
+      
       socket.broadcast
-        .in(receiver).emit(CALL_EVENTS.callOfferReceived, { caller, roomId, callType });
+        .in(receiver).emit(CALL_EVENTS.callOfferReceived, { caller, roomId, callType, groupName });
 
       // let acceptedTheInvite = false;
       // if(isOnline) {

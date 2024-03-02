@@ -1,6 +1,6 @@
 import { Server } from 'socket.io';
 import CHAT_EVENTS from './eventsMap';
-import { mountJoinChatEvent, mountParticipantStoppedTypingEvent, mountParticipantTypingEvent } from './socketEvents';
+import { mountCallInitiatedEvent, mountCallJoinEvent, mountCallRejectedEvent, mountHangUpEvent, mountJoinChatEvent, mountParticipantStoppedTypingEvent, mountParticipantTypingEvent, mountToggleAudioEvent, mountToggleVideoEvent } from './socketEvents';
 import UsersMap from '../usersMap';
 
 const initializeSocketIO = ({ io, usersRegistry }: { io: Server, usersRegistry: UsersMap }) => {
@@ -22,6 +22,12 @@ const initializeSocketIO = ({ io, usersRegistry }: { io: Server, usersRegistry: 
     mountJoinChatEvent(socket);
     mountParticipantTypingEvent(socket);
     mountParticipantStoppedTypingEvent(socket);
+    mountCallInitiatedEvent(socket);
+    mountCallJoinEvent(socket);
+    mountCallRejectedEvent(socket);
+    mountToggleAudioEvent(socket);
+    mountToggleVideoEvent(socket);
+    mountHangUpEvent(socket);
 
     // * Disconnected Event
     socket.on(CHAT_EVENTS.disconnected, () => {

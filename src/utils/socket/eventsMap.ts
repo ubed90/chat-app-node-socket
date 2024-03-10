@@ -4,6 +4,12 @@ const DISCONNECT_EVENT = 'disconnected';
 
 const JOIN_CHAT_EVENT = 'joinChat';
 
+// ? when a user leaves the chat, this event is fired just to let the other user know
+const LEAVE_CHAT_EVENT = 'leaveChat';
+
+// ? ------
+const EXISTING_USERS_EVENT = 'existingUsers';
+
 const DELETE_CHAT_EVENT = "deleteChat";
   // ? when admin updates a group name
 const UPDATE_GROUP_NAME_EVENT = "updateGroupName";
@@ -58,6 +64,8 @@ enum CHAT_EVENTS {
   connected = CONNECTED_EVENT,
   disconnected = DISCONNECT_EVENT,
   joinChat = JOIN_CHAT_EVENT,
+  leaveChat = LEAVE_CHAT_EVENT,
+  existingUsers = EXISTING_USERS_EVENT,
   deleteChat = DELETE_CHAT_EVENT,
   updateGroupName = UPDATE_GROUP_NAME_EVENT,
   onMessage = MESSAGE_RECEIVED_EVENT,

@@ -1,6 +1,6 @@
 import { Server } from 'socket.io';
 import CHAT_EVENTS from './eventsMap';
-import { mountCallInitiatedEvent, mountCallJoinEvent, mountCallRejectedEvent, mountHangUpEvent, mountJoinChatEvent, mountParticipantStoppedTypingEvent, mountParticipantTypingEvent, mountToggleAudioEvent, mountToggleVideoEvent } from './socketEvents';
+import { mountCallInitiatedEvent, mountCallJoinEvent, mountCallRejectedEvent, mountExistingUsersEvent, mountHangUpEvent, mountJoinChatEvent, mountLeaveChatEvent, mountParticipantStoppedTypingEvent, mountParticipantTypingEvent, mountToggleAudioEvent, mountToggleVideoEvent } from './socketEvents';
 import UsersMap from '../usersMap';
 
 const initializeSocketIO = ({ io, usersRegistry }: { io: Server, usersRegistry: UsersMap }) => {
@@ -20,6 +20,8 @@ const initializeSocketIO = ({ io, usersRegistry }: { io: Server, usersRegistry: 
 
     // Common events that needs to be mounted on the initialization
     mountJoinChatEvent(socket);
+    mountLeaveChatEvent(socket);
+    mountExistingUsersEvent(socket);
     mountParticipantTypingEvent(socket);
     mountParticipantStoppedTypingEvent(socket);
     mountCallInitiatedEvent(socket);

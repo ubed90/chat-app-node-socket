@@ -4,11 +4,29 @@ import { Request } from 'express';
 import { usersRegistry } from '../usersMap';
 
 const mountJoinChatEvent = (socket: Socket) => {
-  socket.on(CHAT_EVENTS.joinChat, (chatId: string) => {
-    console.log(`User joined the chat 🤝. chatId: `, chatId);
-    socket.join(chatId);
+  socket.on(CHAT_EVENTS.joinChat, (props: { chatId: string, userId: string }) => {
+    console.log(props.userId + ' joined the chat 🤝. chatId: ' + props.chatId);
+    socket.join(props.chatId);
+    socket.in(props.chatId).emit(CHAT_EVENTS.joinChat, props);
   });
 };
+
+const mountLeaveChatEvent = (socket: Socket) => {
+  socket.on(CHAT_EVENTS.leaveChat, (props: { chatId: string, userId: string }) => {
+    console.log(props.userId + ' Left the chat 📢. chatId: ' + props.chatId);
+    socket.in(props.chatId).emit(CHAT_EVENTS.leaveChat, props);
+    socket.leave(props.chatId);
+  })
+}
+
+const mountExistingUsersEvent = (socket: Socket) => {
+  socket.on(
+    CHAT_EVENTS.existingUsers,
+    (props: { chatId: string; userId: string, otherUser: string }) => {
+      socket.broadcast.in(props.otherUser).emit(CHAT_EVENTS.existingUsers, props);
+    }
+  );
+}
 
 const mountParticipantTypingEvent = (socket: Socket) => {
   socket.on(CHAT_EVENTS.startTyping, (chatId) => {
@@ -100,6 +118,8 @@ const emitSocketEvent = (
 
 export {
   mountJoinChatEvent,
+  mountLeaveChatEvent,
+  mountExistingUsersEvent,
   mountParticipantTypingEvent,
   mountParticipantStoppedTypingEvent,
   emitSocketEvent,

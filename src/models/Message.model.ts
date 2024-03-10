@@ -6,6 +6,7 @@ export interface IMessage {
     sender: Types.ObjectId;
     content: string;
     chat: Types.ObjectId,
+    status: 'SENT' | 'DELIVERED' | 'READ',
     isNotification?: boolean;
     isAttachment?: boolean;
     attachment?: IAttachment;
@@ -28,6 +29,11 @@ const schema = new Schema<IMessage, MessageModel, IMessageMethods>(
     sender: {
       type: Schema.Types.ObjectId,
       ref: 'User',
+    },
+    status: {
+      type: String,
+      enum: ['SENT', 'DELIVERED', 'READ'],
+      default: 'SENT'
     },
     isNotification: {
       type: Boolean,

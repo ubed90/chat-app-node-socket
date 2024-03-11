@@ -57,6 +57,15 @@ const getAllChatMessagesController = async (req: Request, res: Response) => {
 
   if (!chat) throw new NotFoundError("You don't have any such chat");
 
+  if(!chat.isGroupChat) {
+    await Message.updateMany({
+      chat: chatId,
+      $nor: [{ sender: res.locals.user._id }]
+    }, {
+      status: 'READ'
+    });
+  }
+
   const allMessages = await Message.aggregate([
     {
       $match: {
@@ -91,7 +100,8 @@ const getAllChatMessagesController = async (req: Request, res: Response) => {
 const sendMessageController = async (req: Request, res: Response) => {
   const { chatId } = req.params;
   const { content } = req.body;
-
+  let { status } = req.body;
+ 
   if (!chatId) throw new BadRequestError('Invalid request');
   if (!content) throw new BadRequestError('Message field cannot be empty.');
 
@@ -106,10 +116,23 @@ const sendMessageController = async (req: Request, res: Response) => {
 
   if (!chat) throw new NotFoundError("You don't have any such chat");
 
+  if(!status) {
+    status = chat.isGroupChat
+      ? 'SENT'
+      : usersRegistry.getUserStatus(
+          chat.users
+            .filter((user) => user._id.toString() !== res.locals.user._id)[0]
+            ._id.toString()
+        )
+      ? 'DELIVERED'
+      : 'SENT';
+  }
+
   const newMessage = await Message.create({
     content,
     sender: new Types.ObjectId(res.locals.user._id),
     chat: new Types.ObjectId(chatId),
+    status
   });
 
   chat.lastMessage = new Types.ObjectId(newMessage._id);
@@ -145,6 +168,7 @@ const sendMessageController = async (req: Request, res: Response) => {
 
 const sendAttachmentController = async (req: Request, res: Response) => {
   const { chatId } = req.params;
+  let { status } = req.body;
 
   if (!chatId || !req.files) throw new BadRequestError('Invalid request');
 
@@ -161,11 +185,24 @@ const sendAttachmentController = async (req: Request, res: Response) => {
 
   const file = req.files.attachments as UploadedFile;
 
+  if (!status) {
+    status = chat.isGroupChat
+      ? 'SENT'
+      : usersRegistry.getUserStatus(
+          chat.users
+            .filter((user) => user._id.toString() !== res.locals.user._id)[0]
+            ._id.toString()
+        )
+      ? 'DELIVERED'
+      : 'SENT';
+  }
+
   let messagePayload: IMessage = {
     sender: new Types.ObjectId(res.locals.user._id),
     chat: new Types.ObjectId(chat._id),
     content: file.name,
     isAttachment: true,
+    status
   };
 
   if (file.mimetype.startsWith('image/')) {
@@ -217,9 +254,9 @@ const sendAttachmentController = async (req: Request, res: Response) => {
   if (file.mimetype.includes('pdf') || file.mimetype.includes('mp3')) {
     fs.unlinkSync(file.tempFilePath);
   }
-  
+
   chat.lastMessage = new Types.ObjectId(newMessage._id);
-  
+
   await chat.save();
 
   const message = await Message.aggregate([

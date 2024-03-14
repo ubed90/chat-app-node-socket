@@ -569,7 +569,7 @@ const leaveGroupChatController = async (req: Request, res: Response) => {
 
   if (!chatId) throw new BadRequestError('Invalid request');
 
-  const groupChat = await Chat.findOne({ _id: chatId, isGroupChat: true });
+  const groupChat = await Chat.findOne({ _id: chatId, isGroupChat: true }).populate('admin');
 
   if (!groupChat)
     throw new NotFoundError(`No Group Chat found with ID: ${chatId}`);
@@ -579,52 +579,72 @@ const leaveGroupChatController = async (req: Request, res: Response) => {
 
   const userToRemove = await User.findOne({ _id: res.locals.user._id });
 
-  const notificationMessage = await Message.create({
-    content: userToRemove?.name + ' left the Group',
-    chat: groupChat._id,
-    sender: userToRemove?._id,
-    isNotification: true,
-  });
+  if(groupChat.users.length !== 1) {
+    let newAdmin = undefined;
 
-  // * NEW
-  const updatedChat = await Chat.findOneAndUpdate(
-    { _id: chatId },
-    {
-      $pull: {
-        users: res.locals.user._id,
-      },
-      lastMessage: notificationMessage._id,
-    },
-    {
-      new: true,
+    if (
+      userToRemove?._id.toString() === groupChat.admin._id.toString() &&
+      groupChat.users.length > 1
+    ) {
+      newAdmin =
+        groupChat.users[Math.floor(groupChat.users.length * Math.random())];
     }
-  );
 
-  const chat = await Chat.aggregate([
-    {
-      $match: {
-        _id: updatedChat?._id,
-      },
-    },
-    ...chatCommonAggregation(),
-  ]);
-
-  if (!chat[0]) {
-    throw new NotFoundError('Group chat does not exist');
-  }
-
-  updatedChat?.users.forEach((user) => {
-    if (user._id.toString() === res.locals.user._id) return;
-
-    emitSocketEvent(req, user._id.toString(), CHAT_EVENTS.onMessage, {
-      newMessage: notificationMessage,
-      chat: chat[0]
+    const notificationMessage = await Message.create({
+      content: userToRemove?.name + ' left the Group',
+      chat: groupChat._id,
+      sender: userToRemove?._id,
+      isNotification: true,
     });
-  });
+
+    // * NEW
+    const updatedChat = await Chat.findOneAndUpdate(
+      { _id: chatId },
+      {
+        $pull: {
+          users: res.locals.user._id,
+        },
+        lastMessage: notificationMessage._id,
+        ...(newAdmin ? { admin: newAdmin } : {}),
+      },
+      {
+        new: true,
+      }
+    );
+
+    const chat = await Chat.aggregate([
+      {
+        $match: {
+          _id: updatedChat?._id,
+        },
+      },
+      ...chatCommonAggregation(),
+    ]);
+
+    if (!chat[0]) {
+      throw new NotFoundError('Group chat does not exist');
+    }
+
+    updatedChat?.users.forEach((user) => {
+      if (user._id.toString() === res.locals.user._id) return;
+
+      emitSocketEvent(req, user._id.toString(), CHAT_EVENTS.onMessage, {
+        newMessage: notificationMessage,
+        chat: chat[0],
+      });
+    });
+
+    return res.status(StatusCodes.OK).json({
+      status: 'success',
+      message: `You Left group ${updatedChat?.name} successfully`,
+    });
+  } else {
+    await groupChat.deleteOne();
+  }
 
   return res.status(StatusCodes.OK).json({
     status: 'success',
-    message: `You Left group ${updatedChat?.name} successfully`,
+    message: `You Left group ${groupChat?.name} successfully`,
   });
 };
 

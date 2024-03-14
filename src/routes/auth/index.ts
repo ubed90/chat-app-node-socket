@@ -9,6 +9,7 @@ import {
   removeProfilePictureController,
   resetPasswordController,
   updateProfileController,
+  updateProfilePictureController,
   verifyEmailController,
 } from '@/controllers/auth';
 import authMiddleware from '@/middlewares/auth.middleware';
@@ -32,6 +33,7 @@ router.route('/logout').post(authMiddleware, logoutController);
 router
   .route('/update-profile/:id')
   .patch(authMiddleware, updateProfileController)
+  .post(authMiddleware, updateProfilePictureController)
   .delete(authMiddleware, removeProfilePictureController);
 
 router.route('/change-password').post(authMiddleware, changePasswordController);

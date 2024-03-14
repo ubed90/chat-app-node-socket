@@ -476,6 +476,39 @@ const updateProfileController = async (req: Request, res: Response) => {
   });
 };
 
+const updateProfilePictureController = async (req: Request, res: Response) => {
+  const profilePicture = req.files?.profilePicture;
+
+  if(!profilePicture) throw new BadRequestError('Please provide an image to upload');
+
+  const user = await User.findById(res.locals.user._id);
+
+  if(!user) throw new UnauthorizedError('Not allowed to update profile.')
+
+  const { secure_url, public_id } = await ImageService.uploadImage({
+    file: profilePicture as UploadedFile,
+    upload_folder: res.locals.user.email,
+  });
+
+  if (user?.profilePicture) {
+    // ! Delete Previous Image Logic
+    await ImageService.deleteImage(user);
+  }
+  user.profilePicture = { public_id, url: secure_url };
+
+  await user.save();
+
+  return res.status(StatusCodes.OK).json({
+    status: 'success',
+    message: 'Profile Updated Successfully 🚀',
+    user: {
+      ...user.toJSON(),
+      profilePicture: user?.profilePicture?.url,
+      phoneNumber: user?.phoneNumber,
+    },
+  });
+}
+
 const removeProfilePictureController = async (req: Request, res: Response) => {
   const { id: _id } = req.params;
 
@@ -512,5 +545,6 @@ export {
   resetPasswordController,
   updateProfileController,
   removeProfilePictureController,
+  updateProfilePictureController,
   changePasswordController
 };

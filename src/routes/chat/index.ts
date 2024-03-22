@@ -6,7 +6,7 @@ import {
   deleteGroupChatController,
   getAllChatsController,
   getAvailableUsersController,
-  getGroupChatDetailsController,
+  getChatDetailsController,
   leaveGroupChatController,
   removeUserFromGroupController,
   renameGroupChatController,
@@ -36,8 +36,9 @@ router.route('/group/delete').delete(deleteGroupChatController);
 
 router
   .route('/group/:groupId')
-  .get(getGroupChatDetailsController)
   .patch(addUserToGroupController)
   .delete(removeUserFromGroupController);
+
+router.route('/:chatId').get(getChatDetailsController);
 
 export default router;

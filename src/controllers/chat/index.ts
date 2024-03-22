@@ -326,21 +326,20 @@ const createGroupChatController = async (req: Request, res: Response) => {
   });
 };
 
-const getGroupChatDetailsController = async (req: Request, res: Response) => {
-  const { groupId } = req.params;
+const getChatDetailsController = async (req: Request, res: Response) => {
+  const { chatId } = req.params;
 
   const chat = await Chat.aggregate([
     {
       $match: {
-        _id: new Types.ObjectId(groupId),
-        isGroupChat: true,
+        _id: new Types.ObjectId(chatId),
       },
     },
     ...chatCommonAggregation(),
   ]);
 
   if (!chat[0]) {
-    throw new NotFoundError('Group chat does not exist');
+    throw new NotFoundError('Chat does not exist');
   }
 
   return res.status(StatusCodes.OK).json({
@@ -716,6 +715,6 @@ export {
   removeUserFromGroupController,
   leaveGroupChatController,
   deleteChatController,
-  getGroupChatDetailsController,
+  getChatDetailsController,
   deleteGroupChatController,
 };

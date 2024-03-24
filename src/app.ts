@@ -43,11 +43,15 @@ const app = express();
 // ! Initialize Sockets
 const httpServer = createServer(app);
 export const io = new Server(httpServer, {
-    pingTimeout: 60000,
-    cors: {
-        origin: process.env.ORIGIN,
-        credentials: true,
-    }
+  pingTimeout: 60000,
+  ...(process.env.NODE_ENV === 'development'
+    ? {
+        cors: {
+          origin: process.env.ORIGIN,
+          credentials: true,
+        },
+      }
+    : {}),
 });
 
 // * Initialize our Peer Server
@@ -70,7 +74,7 @@ app.use(express.json({ limit: '16kb' }));
 app.use(fileUpload({ useTempFiles: true }))
 app.use(express.urlencoded({ extended: true, limit: '16kb' }));
 app.use(cookieParser(process.env.JWT_SECRET))
-if(process.env.NODE_ENV) {
+if(process.env.NODE_ENV === 'development') {
     app.use(
       cors({
         origin: process.env.ORIGIN,
@@ -84,7 +88,11 @@ if(process.env.NODE_ENV) {
 // * Routes
 app.use('/peerjs', peerServer);
 
-app.use('/api/v1', appRoutes)
+app.use('/api/v1', appRoutes);
+
+app.use('*', (_, res) => {
+  return res.sendFile(path.resolve(__dirname, '../', 'public', 'index.html'));
+});
 
 // * Not Found and Error Handler MW
 app.use(notFoundMiddleware);
@@ -96,7 +104,11 @@ initializeSocketIO({ io, usersRegistry });
 
 const start = async () => {
     try {
-        await connectWithDatabase(process.env.MONGO_URI as string + process.env.DB_NAME)
+        await connectWithDatabase(
+          process.env.NODE_ENV === 'development'
+            ? process.env.MONGO_URI_DEV as string
+            : process.env.MONGO_URI_PROD as string
+        );
         httpServer.listen(PORT, () => console.log(`App is running on http:localhost:${PORT} 🚀`))
     } catch (error) {
         console.log(error)

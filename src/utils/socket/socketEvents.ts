@@ -5,7 +5,6 @@ import { usersRegistry } from '../usersMap';
 
 const mountJoinChatEvent = (socket: Socket) => {
   socket.on(CHAT_EVENTS.joinChat, (props: { chatId: string, userId: string }) => {
-    console.log(props.userId + ' joined the chat 🤝. chatId: ' + props.chatId);
     socket.join(props.chatId);
     socket.in(props.chatId).emit(CHAT_EVENTS.joinChat, props);
   });
@@ -13,7 +12,6 @@ const mountJoinChatEvent = (socket: Socket) => {
 
 const mountLeaveChatEvent = (socket: Socket) => {
   socket.on(CHAT_EVENTS.leaveChat, (props: { chatId: string, userId: string }) => {
-    console.log(props.userId + ' Left the chat 📢. chatId: ' + props.chatId);
     socket.in(props.chatId).emit(CHAT_EVENTS.leaveChat, props);
     socket.leave(props.chatId);
   })
@@ -54,18 +52,6 @@ const mountCallInitiatedEvent = (socket: Socket) => {
       socket.broadcast
         .in(receiver).emit(CALL_EVENTS.callOfferReceived, { caller, roomId, callType, groupName });
 
-      // let acceptedTheInvite = false;
-      // if(isOnline) {
-      //   try {
-      //     acceptedTheInvite = await socket.broadcast
-      //       .in(receiver as string)
-      //       .timeout(40000)
-      //       .emitWithAck(CALL_EVENTS.callOfferReceived, { caller, roomId });
-      //   } catch (error) {
-      //     acceptedTheInvite = false;
-      //   }
-      // }
-      console.log("SENT ACK TO CALLER :: ",isOnline);
       isUserOnline(isOnline)
     }
   );
@@ -73,7 +59,6 @@ const mountCallInitiatedEvent = (socket: Socket) => {
 
 const mountCallJoinEvent = (socket: Socket) => {
   socket.on(CALL_EVENTS.callJoined, ({ roomId, user, peerId }) => {
-    console.log(user.name + ' JOINED ROOM :: ', roomId);
     socket.join(roomId);
     socket.in(roomId).emit(CALL_EVENTS.callConnected, { user, peerId });
   });
@@ -87,21 +72,18 @@ const mountCallRejectedEvent = (socket: Socket) => {
 
 const mountToggleAudioEvent = (socket: Socket) => {
   socket.on(CALL_EVENTS.toggleAudio, ({ userId, roomId }) => {
-    console.log(`EVENT EMITTED IN BY ${userId}::`, roomId);
     socket.in(roomId).emit(CALL_EVENTS.toggleAudio, userId);
   });
 };
 
 const mountToggleVideoEvent = (socket: Socket) => {
   socket.on(CALL_EVENTS.toggleVideo, ({ userId, roomId }) => {
-    console.log(`EVENT EMITTED IN BY ${userId}::`, roomId);
     socket.in(roomId).emit(CALL_EVENTS.toggleVideo, userId);
   });
 };
 
 const mountHangUpEvent = (socket: Socket) => {
   socket.on(CALL_EVENTS.userHangUp, ({ user, roomId }) => {
-    console.log(`USER HANGING UP IN ROOM ${roomId}::`, user._id);
     socket.in(roomId).emit(CALL_EVENTS.userHangUp, user);
     // socket.leave(roomId);
   });

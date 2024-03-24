@@ -187,9 +187,6 @@ const getAvailableUsersController = async (req: Request, res: Response) => {
     },
   ]);
 
-  console.log(type, search);
-  console.log(users);
-
   return res.status(StatusCodes.OK).json({
     status: 'success',
     message: 'Users Fetched Successfully',
@@ -262,7 +259,6 @@ const createOrAccessChatController = async (req: Request, res: Response) => {
       'Internal Server Error',
       StatusCodes.INTERNAL_SERVER_ERROR
     );
-  console.log(chat);
 
   emitSocketEvent(req, receiverId, CHAT_EVENTS.newChat, chat[0]);
 

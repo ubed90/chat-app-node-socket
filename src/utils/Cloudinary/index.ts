@@ -17,9 +17,7 @@ type UploadImageArgs = {
 
 const ImageService = {
   uploadImage: async ({ file, upload_folder }: UploadImageArgs) => {
-    if ((!file.mimetype.startsWith('image/')) && (!file.mimetype.match(/(jpg|jpeg|png)$/))) {
-      console.log(file.mimetype);
-      
+    if ((!file.mimetype.startsWith('image/')) && (!file.mimetype.match(/(jpg|jpeg|png)$/))) {      
       throw new BadRequestError('Only JPG/JPEG/PNG files are allowed.');
     }
 

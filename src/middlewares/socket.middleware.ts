@@ -18,7 +18,6 @@ const authorizeSocketMiddleware = async (
   next: SocketNextFunction
 ) => {
   try {
-    // console.log("HELLO FROM SOCKET MIDDLEWARE", socket.handshake.headers.cookie);
     const parsedCookies = cookie.parse(socket.handshake.headers.cookie || '');
 
     const cookies = cookieParser.signedCookies(
@@ -26,15 +25,11 @@ const authorizeSocketMiddleware = async (
       process.env.JWT_SECRET as string
     );
 
-    // console.log(cookies);
-
     let token = cookies?.accessToken;
 
     if (!token) {
       token = socket.handshake.auth?.token;
     }
-
-    // console.log(token);
 
     if (!token)
       throw new UnauthorizedError('Un-authorized handshake. Token is missing');
@@ -52,7 +47,7 @@ const authorizeSocketMiddleware = async (
 
     next();
   } catch (error) {
-    console.log('FROM SOCKET MW :: ', error);
+    console.log('ERROR FROM SOCKET MW :: ', error);
     // * Error Establishing Connection Event
     next(new UnauthenticatedError('Session exipred. Please login again'));
   }

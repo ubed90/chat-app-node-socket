@@ -4,23 +4,23 @@ import {
   NotFoundError,
   UnauthenticatedError,
   UnauthorizedError,
-} from '@/errors';
-import { User } from '@/models';
+} from '@errors';
+import { User } from '@models';
 import { Request, Response } from 'express';
 import crypto from 'crypto';
-import { sendPasswordResetEmail, sendVerificationEmail } from '@/utils/email';
+import { sendPasswordResetEmail, sendVerificationEmail } from '@utils/email';
 import {
   attachCookiesToResponse,
   createToken,
   hashString,
   isTokenValid,
-} from '@/utils';
+} from '@utils';
 import { StatusCodes } from 'http-status-codes';
 import { UploadedFile } from 'express-fileupload';
-import ImageService from '@/utils/Cloudinary';
-import { IProfilePicture } from '@/models/ProfilePicture.model';
-import generatePassword from '@/utils/generateRandomPassword';
-import sendAccountCreationEmail from '@/utils/email/sendAccountCreationEmail';
+import ImageService from '@utils/cloudinary';
+import { IProfilePicture } from '@models/ProfilePicture.model';
+import generatePassword from '@utils/generateRandomPassword';
+import {sendAccountCreationEmail} from '@utils/email';
 
 const registerController = async (req: Request, res: Response) => {
   let { name, email, password, profilePicture, username, usingProvider } =

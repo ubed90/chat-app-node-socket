@@ -1,5 +1,5 @@
-import { getAllChatMessagesController, sendAttachmentController, sendMessageController } from "@/controllers/message";
-import authMiddleware from "@/middlewares/auth.middleware";
+import { getAllChatMessagesController, sendAttachmentController, sendMessageController } from "@controllers/message";
+import authMiddleware from "@middlewares/auth.middleware";
 import express from "express";
 
 const router = express.Router();

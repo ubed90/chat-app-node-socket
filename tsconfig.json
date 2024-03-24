@@ -3,9 +3,17 @@
     "target": "ESNext",
     "module": "commonjs",
     "lib": ["dom", "es6", "ES2017", "esnext.asynciterable"],
-    "baseUrl": ".",
+    "baseUrl": "src",
     "paths": {
-      "@/*": ["src/*"]
+      "@errors": ["errors/index"],
+      "@models": ["models/index"],
+      "@models/*": ["models/*"],
+      "@utils": ["utils/index"],
+      "@utils/*": ["utils/*"],
+      "@utils/email": ["utils/email/index"],
+      "@utils/cloudinary": ["utils/Cloudinary/index"],
+      "@middlewares/*": ["middlewares/*"],
+      "@controllers/*": ["controllers/*"]
     },
     "skipLibCheck": true,
     "sourceMap": true,

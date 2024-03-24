@@ -1,5 +1,5 @@
-import { BadRequestError } from '@/errors';
-import { IUser } from '@/models/User.model';
+import { BadRequestError } from '@errors';
+import { IUser } from '@models/User.model';
 import { v2 as Cloudinary } from 'cloudinary';
 import { UploadedFile } from 'express-fileupload';
 import fs from 'fs';

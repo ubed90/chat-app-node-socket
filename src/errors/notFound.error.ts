@@ -1,5 +1,5 @@
 import { StatusCodes, ReasonPhrases } from "http-status-codes";
-import CustomApiError from "./CustomApi.error";
+import CustomApiError from "./customApi.error";
 
 class NotFoundError extends CustomApiError {
 

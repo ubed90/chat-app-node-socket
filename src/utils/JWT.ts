@@ -1,4 +1,4 @@
-import { IUser } from '@/models/User.model';
+import { IUser } from '@models/User.model';
 import { Response } from 'express';
 import JWT from 'jsonwebtoken';
 

@@ -3,10 +3,10 @@ import {
   CustomApiError,
   NotFoundError,
   UnauthorizedError,
-} from '@/errors';
-import { Chat, Message, User } from '@/models';
-import { CHAT_EVENTS } from '@/utils/socket';
-import { emitSocketEvent } from '@/utils/socket/socketEvents';
+} from '@errors';
+import { Chat, Message, User } from '@models';
+import { CHAT_EVENTS } from '@utils/socket';
+import { emitSocketEvent } from '@utils/socket/socketEvents';
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { PipelineStage, Types } from 'mongoose';

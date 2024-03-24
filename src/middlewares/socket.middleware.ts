@@ -6,10 +6,10 @@ import {
   NotFoundError,
   UnauthenticatedError,
   UnauthorizedError,
-} from '@/errors';
-import { User } from '@/models';
+} from '@errors';
+import { User } from '@models';
 import { JwtPayload } from 'jsonwebtoken';
-import { isTokenValid } from '@/utils';
+import { isTokenValid } from '@utils';
 
 type SocketNextFunction = (err?: ExtendedError | undefined) => void;
 

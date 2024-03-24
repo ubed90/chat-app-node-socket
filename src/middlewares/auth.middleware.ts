@@ -1,6 +1,6 @@
-import { UnauthenticatedError } from "@/errors";
-import { User } from "@/models";
-import { attachCookiesToResponse, isTokenValid } from "@/utils";
+import { UnauthenticatedError } from "@errors";
+import { User } from "@models";
+import { attachCookiesToResponse, isTokenValid } from "@utils";
 import { NextFunction, Request, Response } from "express";
 import { JwtPayload } from "jsonwebtoken";
 

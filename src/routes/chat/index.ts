@@ -10,9 +10,9 @@ import {
   leaveGroupChatController,
   removeUserFromGroupController,
   renameGroupChatController,
-} from '@/controllers/chat';
+} from '@controllers/chat';
 import express from 'express';
-import authMiddleware from '@/middlewares/auth.middleware';
+import authMiddleware from '@middlewares/auth.middleware';
 
 const router = express.Router();
 

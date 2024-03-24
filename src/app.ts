@@ -4,7 +4,8 @@ import 'express-async-errors';
 import express from "express";
 
 // ? Config's
-import connectWithDatabase from '@/database';
+import connectWithDatabase from "./database";
+
 
 // ! External MW's
 import cookieParser from "cookie-parser";
@@ -15,7 +16,7 @@ import requestIP from 'request-ip';
 
 // * File Upload MW's
 import fileUpload from "express-fileupload";
-import '@/utils/Cloudinary';
+import '@utils/Cloudinary';
 
 // * Custom Middleware's
 import notFoundMiddleware from './middlewares/notFound.middleware';

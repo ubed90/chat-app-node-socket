@@ -58,7 +58,7 @@ export const io = new Server(httpServer, {
 // * Initialize our Peer Server
 const peerServer = ExpressPeerServer(httpServer, {
     port: Number(PORT),
-    path: '/video-call',
+    path: '/call',
 })
 
 // * Set Socket Auth MW

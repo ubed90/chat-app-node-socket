@@ -56,9 +56,12 @@ export const io = new Server(httpServer, {
 });
 
 // * Initialize our Peer Server
-const peerServer = ExpressPeerServer(httpServer, {
-    port: Number(PORT),
-})
+const peerServer = ExpressPeerServer(httpServer)
+
+peerServer.on('connection', (client) => console.log("NEW REQUEST RECEIVED :: ", client));
+peerServer.on('error', (error) =>
+  console.log('ERROR WHILE PEER CONNECTION :: ', error)
+);
 
 // * Set Socket Auth MW
 io.use(authorizeSocketMiddleware);

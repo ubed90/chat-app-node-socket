@@ -58,7 +58,6 @@ export const io = new Server(httpServer, {
 // * Initialize our Peer Server
 const peerServer = ExpressPeerServer(httpServer, {
     port: Number(PORT),
-    path: '/call',
 })
 
 // * Set Socket Auth MW
@@ -87,7 +86,7 @@ if(process.env.NODE_ENV === 'development') {
 }
 
 // * Routes
-app.use('/peerjs', peerServer);
+app.use('/call', peerServer);
 
 app.use('/api/v1', appRoutes);
 

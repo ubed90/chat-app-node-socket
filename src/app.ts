@@ -34,7 +34,7 @@ import path from 'path';
 import { usersRegistry } from './utils/usersMap';
 
 // * PeerJS Imports
-// import { ExpressPeerServer } from "peer";
+import { ExpressPeerServer } from "peer";
 
 const PORT = process.env.PORT || 3000;
 
@@ -45,23 +45,24 @@ const app = express();
 const httpServer = createServer(app);
 export const io = new Server(httpServer, {
   pingTimeout: 60000,
-  ...(process.env.NODE_ENV === 'development'
-    ? {
-        cors: {
-          origin: process.env.ORIGIN,
-          credentials: true,
-        },
-      }
-    : {}),
+  cors: {
+    origin: process.env.ORIGIN,
+    credentials: true,
+  },
 });
 
 // * Initialize our Peer Server
-// const peerServer = ExpressPeerServer(httpServer)
+const peerServer = ExpressPeerServer(httpServer, {
+  corsOptions: {
+    origin: process.env.ORIGIN,
+    credentials: true,
+  },
+});
 
-// peerServer.on('connection', (client) => console.log("NEW REQUEST RECEIVED :: ", client));
-// peerServer.on('error', (error) =>
-//   console.log('ERROR WHILE PEER CONNECTION :: ', error)
-// );
+peerServer.on('connection', (client) => console.log("NEW REQUEST RECEIVED :: ", client));
+peerServer.on('error', (error) =>
+  console.log('ERROR WHILE PEER CONNECTION :: ', error)
+);
 
 // * Set Socket Auth MW
 io.use(authorizeSocketMiddleware);
@@ -89,7 +90,7 @@ if(process.env.NODE_ENV === 'development') {
 }
 
 // * Routes
-// app.use('/call', peerServer);
+app.use('/call', peerServer);
 
 app.use('/api/v1', appRoutes);
 

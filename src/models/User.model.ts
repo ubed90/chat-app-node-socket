@@ -62,7 +62,6 @@ const schema = new Schema<IUser, UserModel, IUserMethods>(
     },
     phoneNumber: {
       type: String,
-      unique: true,
       trim: true,
       minlength: [10, 'Phone number should be min of 10 characters'],
       maxlength: [10, 'Phone number can be max of 10 characters'],

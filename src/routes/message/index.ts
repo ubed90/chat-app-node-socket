@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.use(authMiddleware);
 
-router.route('/:chatId').get(getAllChatMessagesController).post(sendMessageController);
+router.route('/:chatId/:skip').get(getAllChatMessagesController).post(sendMessageController);
 
 router
   .route('/attachment/:chatId')

@@ -143,10 +143,11 @@ const getAvailableUsersController = async (req: Request, res: Response) => {
       $regex: search,
       $options: 'i',
     },
-    phoneNumber: {
-      $regex: search,
-      $options: 'i',
-    },
+    // ! Removed From PROD - Privacy Issue
+    // phoneNumber: {
+    //   $regex: search,
+    //   $options: 'i',
+    // },
     email: {
       $regex: search,
       $options: 'i',

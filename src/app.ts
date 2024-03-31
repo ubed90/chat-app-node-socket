@@ -113,7 +113,13 @@ const start = async () => {
             ? process.env.MONGO_URI_DEV as string
             : process.env.MONGO_URI_PROD as string
         );
-        httpServer.listen(PORT, () => console.log(`App is running on http:localhost:${PORT} 🚀`))
+        httpServer.listen(PORT, () =>
+          console.log(
+            `App is running on ${
+              process.env.NODE_ENV ? `http:localhost:${PORT}` : process.env.ORIGIN
+            } 🚀`
+          )
+        );
     } catch (error) {
         console.log(error)
         process.exit();

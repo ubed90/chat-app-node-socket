@@ -116,7 +116,7 @@ const start = async () => {
         httpServer.listen(PORT, () =>
           console.log(
             `App is running on ${
-              process.env.NODE_ENV ? `http:localhost:${PORT}` : process.env.ORIGIN
+              process.env.NODE_ENV === 'development' ? `http:localhost:${PORT}` : process.env.ORIGIN
             } 🚀`
           )
         );

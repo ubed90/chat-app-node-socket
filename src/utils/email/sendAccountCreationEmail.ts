@@ -8,7 +8,7 @@ type AccountCreated = {
   password?: string;
 };
 
-const changePasswordURL = `${process.env.ORIGIN}/change-password`;
+const changePasswordURL = `${process.env.ORIGIN}/chats/change-password`;
 
 const sendAccountCreationEmail = ({
   email,

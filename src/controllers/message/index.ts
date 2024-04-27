@@ -1,15 +1,17 @@
-import { BadRequestError, CustomApiError, NotFoundError } from '@/errors';
-import { Chat, Message } from '@/models';
-import { IMessage } from '@/models/Message.model';
-import ImageService from '@/utils/Cloudinary';
-import { CHAT_EVENTS } from '@/utils/socket';
-import { emitSocketEvent } from '@/utils/socket/socketEvents';
+import { BadRequestError, CustomApiError, NotFoundError } from '@errors';
+import { Chat, Message } from '@models';
+import { IMessage } from '@models/Message.model';
+import ImageService from '@utils/cloudinary';
+import { CHAT_EVENTS } from '@utils/socket';
+import { emitSocketEvent } from '@utils/socket/socketEvents';
 import { Request, Response } from 'express';
 import { UploadedFile } from 'express-fileupload';
 import { StatusCodes } from 'http-status-codes';
 import { PipelineStage, Types } from 'mongoose';
 import fs from 'fs';
-import { usersRegistry } from '@/utils/usersMap';
+import { usersRegistry } from '@utils/usersMap';
+
+const MESSAGES_PER_QUERY = 30;
 
 const messagesCommonAggregation = (): PipelineStage[] => {
   return [
@@ -42,7 +44,11 @@ const messagesCommonAggregation = (): PipelineStage[] => {
 };
 
 const getAllChatMessagesController = async (req: Request, res: Response) => {
-  const { chatId } = req.params;
+  let { chatId, skip } = req.params;
+
+  if(!skip) {
+    skip = "0";
+  }
 
   if (!chatId) throw new BadRequestError('Invalid chat Id: ' + chatId);
 
@@ -66,6 +72,10 @@ const getAllChatMessagesController = async (req: Request, res: Response) => {
     });
   }
 
+  let pages = await Message.countDocuments({ chat: chatId });
+
+  pages = Math.floor(pages / MESSAGES_PER_QUERY);
+
   const allMessages = await Message.aggregate([
     {
       $match: {
@@ -76,8 +86,14 @@ const getAllChatMessagesController = async (req: Request, res: Response) => {
     {
       $sort: {
         createdAt: -1,
-      },
+      }
     },
+    {
+      $skip: Number(skip) * MESSAGES_PER_QUERY
+    },
+    {
+      $limit: MESSAGES_PER_QUERY
+    }
   ]);
 
   const isOnline =
@@ -93,6 +109,7 @@ const getAllChatMessagesController = async (req: Request, res: Response) => {
     status: 'success',
     message: 'Messages fetched successfully',
     messages: allMessages,
+    pages,
     isOnline,
   });
 };

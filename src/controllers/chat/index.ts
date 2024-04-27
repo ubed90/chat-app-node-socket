@@ -3,10 +3,10 @@ import {
   CustomApiError,
   NotFoundError,
   UnauthorizedError,
-} from '@/errors';
-import { Chat, Message, User } from '@/models';
-import { CHAT_EVENTS } from '@/utils/socket';
-import { emitSocketEvent } from '@/utils/socket/socketEvents';
+} from '@errors';
+import { Chat, Message, User } from '@models';
+import { CHAT_EVENTS } from '@utils/socket';
+import { emitSocketEvent } from '@utils/socket/socketEvents';
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { PipelineStage, Types } from 'mongoose';
@@ -143,10 +143,11 @@ const getAvailableUsersController = async (req: Request, res: Response) => {
       $regex: search,
       $options: 'i',
     },
-    phoneNumber: {
-      $regex: search,
-      $options: 'i',
-    },
+    // ! Removed From PROD - Privacy Issue
+    // phoneNumber: {
+    //   $regex: search,
+    //   $options: 'i',
+    // },
     email: {
       $regex: search,
       $options: 'i',
@@ -186,9 +187,6 @@ const getAvailableUsersController = async (req: Request, res: Response) => {
       },
     },
   ]);
-
-  console.log(type, search);
-  console.log(users);
 
   return res.status(StatusCodes.OK).json({
     status: 'success',
@@ -262,7 +260,6 @@ const createOrAccessChatController = async (req: Request, res: Response) => {
       'Internal Server Error',
       StatusCodes.INTERNAL_SERVER_ERROR
     );
-  console.log(chat);
 
   emitSocketEvent(req, receiverId, CHAT_EVENTS.newChat, chat[0]);
 

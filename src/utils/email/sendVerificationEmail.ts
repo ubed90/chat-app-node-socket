@@ -1,4 +1,4 @@
-import { IUser } from "@/models/User.model";
+import { IUser } from "@models/User.model";
 import sendEmail, { Person } from "./sendEmail";
 import getTemplate from "./template";
 

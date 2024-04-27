@@ -11,8 +11,8 @@ import {
   updateProfileController,
   updateProfilePictureController,
   verifyEmailController,
-} from '@/controllers/auth';
-import authMiddleware from '@/middlewares/auth.middleware';
+} from '@controllers/auth';
+import authMiddleware from '@middlewares/auth.middleware';
 
 const router = express.Router();
 

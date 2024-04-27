@@ -1,5 +1,5 @@
-import { BadRequestError } from '@/errors';
-import { IUser } from '@/models/User.model';
+import { BadRequestError } from '@errors';
+import { IUser } from '@models/User.model';
 import { v2 as Cloudinary } from 'cloudinary';
 import { UploadedFile } from 'express-fileupload';
 import fs from 'fs';
@@ -17,9 +17,7 @@ type UploadImageArgs = {
 
 const ImageService = {
   uploadImage: async ({ file, upload_folder }: UploadImageArgs) => {
-    if ((!file.mimetype.startsWith('image/')) && (!file.mimetype.match(/(jpg|jpeg|png)$/))) {
-      console.log(file.mimetype);
-      
+    if ((!file.mimetype.startsWith('image/')) && (!file.mimetype.match(/(jpg|jpeg|png)$/))) {      
       throw new BadRequestError('Only JPG/JPEG/PNG files are allowed.');
     }
 

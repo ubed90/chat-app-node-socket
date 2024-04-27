@@ -4,7 +4,8 @@ import 'express-async-errors';
 import express from "express";
 
 // ? Config's
-import connectWithDatabase from '@/database';
+import connectWithDatabase from "./database";
+
 
 // ! External MW's
 import cookieParser from "cookie-parser";
@@ -15,7 +16,7 @@ import requestIP from 'request-ip';
 
 // * File Upload MW's
 import fileUpload from "express-fileupload";
-import '@/utils/Cloudinary';
+import '@utils/Cloudinary';
 
 // * Custom Middleware's
 import notFoundMiddleware from './middlewares/notFound.middleware';
@@ -43,18 +44,25 @@ const app = express();
 // ! Initialize Sockets
 const httpServer = createServer(app);
 export const io = new Server(httpServer, {
-    pingTimeout: 60000,
-    cors: {
-        origin: process.env.ORIGIN,
-        credentials: true,
-    }
+  pingTimeout: 60000,
+  cors: {
+    origin: process.env.ORIGIN,
+    credentials: true,
+  },
 });
 
 // * Initialize our Peer Server
 const peerServer = ExpressPeerServer(httpServer, {
-    port: Number(PORT),
-    path: '/video-call',
-})
+  corsOptions: {
+    origin: process.env.ORIGIN,
+    credentials: true,
+  },
+});
+
+peerServer.on('connection', (client) => console.log("NEW REQUEST RECEIVED :: ", client));
+peerServer.on('error', (error) =>
+  console.log('ERROR WHILE PEER CONNECTION :: ', error)
+);
 
 // * Set Socket Auth MW
 io.use(authorizeSocketMiddleware);
@@ -70,7 +78,7 @@ app.use(express.json({ limit: '16kb' }));
 app.use(fileUpload({ useTempFiles: true }))
 app.use(express.urlencoded({ extended: true, limit: '16kb' }));
 app.use(cookieParser(process.env.JWT_SECRET))
-if(process.env.NODE_ENV) {
+if(process.env.NODE_ENV === 'development') {
     app.use(
       cors({
         origin: process.env.ORIGIN,
@@ -82,9 +90,13 @@ if(process.env.NODE_ENV) {
 }
 
 // * Routes
-app.use('/peerjs', peerServer);
+app.use('/call', peerServer);
 
-app.use('/api/v1', appRoutes)
+app.use('/api/v1', appRoutes);
+
+app.use('*', (_, res) => {
+  return res.sendFile(path.resolve(__dirname, '../', 'public', 'index.html'));
+});
 
 // * Not Found and Error Handler MW
 app.use(notFoundMiddleware);
@@ -96,8 +108,18 @@ initializeSocketIO({ io, usersRegistry });
 
 const start = async () => {
     try {
-        await connectWithDatabase(process.env.MONGO_URI as string + process.env.DB_NAME)
-        httpServer.listen(PORT, () => console.log(`App is running on http:localhost:${PORT} 🚀`))
+        await connectWithDatabase(
+          process.env.NODE_ENV === 'development'
+            ? process.env.MONGO_URI_DEV as string
+            : process.env.MONGO_URI_PROD as string
+        );
+        httpServer.listen(PORT, () =>
+          console.log(
+            `App is running on ${
+              process.env.NODE_ENV === 'development' ? `http:localhost:${PORT}` : process.env.ORIGIN
+            } 🚀`
+          )
+        );
     } catch (error) {
         console.log(error)
         process.exit();

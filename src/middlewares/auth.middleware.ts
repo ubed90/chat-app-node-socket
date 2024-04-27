@@ -1,6 +1,6 @@
-import { UnauthenticatedError } from "@/errors";
-import { User } from "@/models";
-import { attachCookiesToResponse, isTokenValid } from "@/utils";
+import { UnauthenticatedError } from "@errors";
+import { User } from "@models";
+import { attachCookiesToResponse, isTokenValid } from "@utils";
 import { NextFunction, Request, Response } from "express";
 import { JwtPayload } from "jsonwebtoken";
 
@@ -21,11 +21,7 @@ const authMiddleware = async (req: Request, res: Response, next: NextFunction) =
 
         const payload = isTokenValid({ token: refreshToken }) as JwtPayload;
         
-        console.log(payload);
-        
         user = await User.findOne({ _id: payload._id, 'tokens.refreshToken': refreshToken });
-
-        console.log(user);
         
         if (!user)
           throw new UnauthenticatedError('Session Expired. Please login again');
